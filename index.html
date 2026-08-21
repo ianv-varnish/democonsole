@@ -209,33 +209,11 @@ const PRODUCTS = {
       { id:'multi_registry', label:'Many registries', subtitle:'One endpoint, many registries', originColorOverride:'purple-50', effects: [ {type:'fanout'} ] },
       { id:'private_caching', label:'Private caching', subtitle:'Auth-preserving private caching', effects: [ {type:'badge', text: () => '🔒 auth-checked', position:'aboveMid'} ] }
     ]
-  },
-
-  artifact_firewall: {
-    label: 'Artifact Firewall',
-    tierLabels: { left:'Origins', mid:'Firewall', right:'Clients' },
-    leftNodeNames: ORIGIN_SOURCES,
-    midNodeLabel: i => 'FIREWALL-'+(i+1),
-    rightNodeLabel: i => 'client-'+String(i+1).padStart(2,'0'),
-    metrics: {
-      volume: { label:'Monthly package requests', unit:'TB/mo', min:1, max:1000, step:1, default:60 },
-      ratio:  { label:'Policy block rate', unit:'%', min:0, max:100, step:5, default:8 }
-    },
-    model: { divertedLabel:'blocked / mo', passthroughLabel:'allowed to origin' },
-    responseBlend: { colorA:'teal-50', colorB:'red', weightSource:'diverted' },
-    legend: [
-      { color:'blue-50', label:'Request' },
-      { color:'teal-50', label:'Allowed' },
-      { color:'red', label:'Blocked' }
-    ],
-    scenarios: [
-      { id:'policy_enforcement', label:'Request-time policy', subtitle:'Blocks risky packages before they reach origin', effects: [ {type:'blockGate'} ] }
-    ]
   }
 
 };
 
-const PRODUCTS_COMING_SOON = ['Ora Streaming','Varnish CDN','Varnish AI Accelerator','Varnish Enterprise'];
+const PRODUCTS_COMING_SOON = ['Artifact Firewall','Ora Streaming','Varnish CDN','Varnish AI Accelerator','Varnish Enterprise'];
 
 /* =========================================================================
    ENGINE — generic. Reads PRODUCTS + current state, knows nothing about
