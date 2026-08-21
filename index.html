@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Varnish Demo Console — Virtual Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-10:#E5F2FF; --blue-20:#B2D9FF; --blue-30:#66BAFF; --blue-40:#33A3FF;
+    --blue-50:#008CFF; --blue-60:#0763ED; --blue-70:#0D51B8; --blue-80:#0B418C;
+    --pink-50:#B84DFF; --purple-50:#594DFF; --teal-50:#00BECC; --lime-50:#B4E52E;
+    --gray-05:#FAFAFA; --gray-10:#F7F7F7; --gray-20:#F0F0F0; --gray-30:#E1E2E3;
+    --gray-40:#B8B8B8; --gray-50:#949AA2; --gray-60:#818181; --gray-70:#4E5157;
+    --gray-80:#383B40; --gray-85:#25272A; --gray-90:#141415; --gray-100:#0A0A0A;
+    --white:#FFFFFF;
+    --bg: var(--gray-05); --panel-bg: var(--white); --panel-border: var(--gray-30);
+    --node-bg: var(--gray-20); --node-border: var(--gray-60);
+    --text-primary: var(--gray-100); --text-secondary: var(--gray-70);
+    --rail-bg: var(--gray-100); --rail-text: var(--gray-10); --rail-text-dim: var(--gray-60);
+    --varnish-fill: #E5F2FF;
+  }
+  [data-theme="dark"]{
+    --bg: var(--gray-100); --panel-bg: var(--gray-90); --panel-border: var(--gray-80);
+    --node-bg: var(--gray-90); --node-border: var(--gray-70);
+    --text-primary: var(--gray-10); --text-secondary: var(--gray-50);
+    --varnish-fill: #0D2363;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; height:100vh; overflow:hidden; font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+    background:var(--bg); color:var(--text-primary); display:flex; }
+  .mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; }
+
+  .rail{ width:240px; min-width:240px; background:var(--rail-bg); color:var(--rail-text);
+    display:flex; flex-direction:column; padding:20px 0; height:100vh; overflow-y:auto; }
+  .rail-brand{ padding:0 20px 18px; font-weight:700; font-size:15px; letter-spacing:.02em; }
+  .rail-brand span{ color:var(--blue-40); }
+  .rail-section-label{ padding:14px 20px 6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace; }
+  .rail-item{ padding:9px 20px; font-size:14px; cursor:pointer; border-left:3px solid transparent;
+    color:var(--rail-text-dim); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .rail-item:hover{ color:var(--rail-text); background:rgba(255,255,255,0.04); }
+  .rail-item.active{ color:var(--white); border-left-color:var(--blue-40); background:rgba(0,140,255,0.14); font-weight:500; }
+  .rail-item .tag{ font-family:'IBM Plex Mono',monospace; font-size:9px; padding:2px 6px; border-radius:4px;
+    background:var(--gray-80); color:var(--rail-text-dim); letter-spacing:.04em; }
+  .rail-item.active .tag{ background:var(--blue-60); color:var(--white); }
+
+  .main{ flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--panel-border); }
+  .topbar h1{ font-size:18px; font-weight:600; margin:0; }
+  .topbar .subtitle{ font-size:12.5px; color:var(--text-secondary); margin-top:2px; }
+  .theme-toggle{ border:1px solid var(--panel-border); background:transparent; color:var(--text-primary);
+    border-radius:100px; padding:6px 14px; font-size:12px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+
+  .canvas-wrap{ flex:1; position:relative; padding:8px 26px; min-height:0; }
+  .canvas-panel{ background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:20px; height:100%; position:relative; overflow:hidden; }
+  svg{ width:100%; height:100%; display:block; }
+
+  .impact-badge{ position:absolute; top:16px; right:16px; background:var(--gray-100); color:#fff;
+    border-radius:12px; padding:9px 14px; text-align:right; }
+  .impact-badge .num{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:18px; color:var(--blue-30); line-height:1; }
+  .impact-badge .lab{ font-size:9.5px; color:var(--gray-50); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+
+  .legend{ position:absolute; bottom:16px; left:16px; display:flex; gap:14px; flex-wrap:wrap;
+    background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:12px; padding:7px 13px; font-size:10.5px; color:var(--text-secondary); }
+  .legend .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+
+  .controls{ border-top:1px solid var(--panel-border); padding:12px 26px 14px; display:flex; flex-direction:column; gap:10px; }
+  .controls-row{ display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap; }
+  .control-group{ display:flex; flex-direction:column; gap:5px; min-width:110px; }
+  .control-group label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); font-family:'IBM Plex Mono',monospace; }
+  .stepper{ display:flex; align-items:center; gap:8px; }
+  .stepper button{ width:24px; height:24px; border-radius:50%; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:14px; cursor:pointer; line-height:1; }
+  .stepper button:hover{ background:var(--node-bg); }
+  .stepper .val{ min-width:20px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
+
+  input[type=range]{ width:130px; accent-color: var(--blue-50); }
+  .slider-row{ display:flex; align-items:center; gap:8px; }
+  .slider-row .val{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; min-width:64px; }
+
+  .scenario-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+  .scenario-btn{ padding:8px 14px; border-radius:100px; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:12px; cursor:pointer; font-weight:500; }
+  .scenario-btn:hover{ background:var(--node-bg); }
+  .scenario-btn.active{ background:var(--gray-100); color:var(--white); border-color:var(--gray-100); }
+  [data-theme="dark"] .scenario-btn.active{ background:var(--blue-50); border-color:var(--blue-50); color:var(--white); }
+
+  .spacer{ flex:1; }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="rail">
+  <div class="rail-brand">VARNISH <span>// DEMO CONSOLE</span></div>
+
+  <div class="rail-section-label">Products</div>
+  <div class="rail-item active">Virtual Registry <span class="tag">LIVE</span></div>
+  <div class="rail-item">Artifact Firewall <span class="tag">soon</span></div>
+  <div class="rail-item">Ora Streaming <span class="tag">soon</span></div>
+  <div class="rail-item">Varnish CDN <span class="tag">soon</span></div>
+  <div class="rail-item">Varnish AI Accelerator <span class="tag">soon</span></div>
+  <div class="rail-item">Varnish Enterprise <span class="tag">soon</span></div>
+
+  <div class="rail-section-label">Virtual Registry — views</div>
+  <div class="rail-item sc-item active" data-sc="baseline">Steady-state traffic</div>
+  <div class="rail-item sc-item" data-sc="coalescing">Cache miss + coalescing</div>
+  <div class="rail-item sc-item" data-sc="multi_registry">One endpoint, many registries</div>
+  <div class="rail-item sc-item" data-sc="private_caching">Auth-preserving private caching</div>
+
+  <div style="flex:1"></div>
+  <div style="padding:14px 20px; font-size:11px; color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace;">prototype v0.3</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Virtual Registry</h1>
+      <div class="subtitle" id="topSubtitle">Steady-state traffic</div>
+    </div>
+    <button class="theme-toggle" id="themeToggle">◐ dark mode</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <div class="canvas-panel">
+      <svg id="diagram" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="impact-badge">
+        <div class="num" id="impactNum">72 TB</div>
+        <div class="lab">offloaded / mo</div>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--blue-50)"></i>Request</span>
+        <span><i class="dot" style="background:var(--teal-50)"></i>Served from cache</span>
+        <span><i class="dot" style="background:var(--pink-50)"></i>Origin fetch</span>
+        <span><i class="dot" style="background:var(--purple-50)"></i>Routing</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="controls-row">
+      <div class="control-group">
+        <label>Clients</label>
+        <div class="stepper">
+          <button data-adj="clients" data-delta="-1">−</button>
+          <span class="val" id="val-clients">24</span>
+          <button data-adj="clients" data-delta="1">+</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Varnish nodes</label>
+        <div class="stepper">
+          <button data-adj="nodes" data-delta="-1">−</button>
+          <span class="val" id="val-nodes">2</span>
+          <button data-adj="nodes" data-delta="1">+</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Upstreams</label>
+        <div class="stepper">
+          <button data-adj="upstreams" data-delta="-1">−</button>
+          <span class="val" id="val-upstreams">4</span>
+          <button data-adj="upstreams" data-delta="1">+</button>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="control-group">
+        <label>View</label>
+        <div class="scenario-btns" id="scenarioBtns"></div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="control-group" style="min-width:220px">
+        <label>Monthly traffic volume</label>
+        <div class="slider-row">
+          <input type="range" id="sl-traffic" min="1" max="1000" step="1" value="80">
+          <span class="val" id="val-traffic">80 TB/mo</span>
+        </div>
+      </div>
+      <div class="control-group" style="min-width:190px">
+        <label>Cache hit ratio</label>
+        <div class="slider-row">
+          <input type="range" id="sl-hit" min="0" max="100" step="5" value="90">
+          <span class="val" id="val-hit">90%</span>
+        </div>
+      </div>
+      <div class="spacer"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+const state = {
+  clients: 24, nodes: 2, upstreams: 4, scenario: 'baseline', theme: 'light',
+  traffic: 80, hitRatio: 90
+};
+const ORIGIN_SOURCES = ['JFrog Artifactory','Sonatype Nexus','Docker Hub','npm Registry','PyPI','Maven Central','Amazon ECR','Google Artifact Registry','Azure Container Registry','S3-backed store'];
+
+const SC_LABELS = { baseline:'Steady-state traffic', coalescing:'Cache miss + coalescing', multi_registry:'Many registries', private_caching:'Private caching' };
+const SC_SUBTITLE = { baseline:'Steady-state traffic', coalescing:'Cache miss + request coalescing', multi_registry:'One endpoint, many registries', private_caching:'Auth-preserving private caching' };
+
+/* ---------------- color helpers ---------------- */
+function tok(v){ if(v.startsWith('var(')){ const t=v.slice(4,-1).trim(); return getComputedStyle(document.documentElement).getPropertyValue(t).trim(); } return v; }
+function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return [n>>16&255, n>>8&255, n&255]; }
+function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join(''); }
+function mixHex(a,b,t){ const A=hexToRgb(a), B=hexToRgb(b); return rgbToHex(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t); }
+function lighten(hex,amt){ return mixHex(hex, '#ffffff', amt); }
+function mapRange(v,i0,i1,o0,o1){ v=Math.max(i0,Math.min(i1,v)); return o0 + (v-i0)/(i1-i0)*(o1-o0); }
+
+/* ---------------- svg core ---------------- */
+const svg = document.getElementById('diagram');
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+let defs, flows=[], flowSeq=0;
+function clearSvg(){ while(svg.firstChild) svg.removeChild(svg.firstChild); defs=el('defs',{}); svg.appendChild(defs); flows=[]; }
+
+function stackNodes(cx, topY, count, w, h, gap, maxShow, labelFn, fill, stroke, textColor){
+  const group=el('g',{});
+  const shown=Math.min(count,maxShow);
+  const totalH=shown*h+(shown-1)*gap;
+  let y=topY-totalH/2;
+  for(let i=0;i<shown;i++){
+    group.appendChild(el('rect',{x:cx-w/2,y:y,width:w,height:h,rx:14,fill:fill,stroke:stroke,'stroke-width':1.4}));
+    const t=el('text',{x:cx,y:y+h/2+4,'text-anchor':'middle','font-size':11,fill:textColor,'font-family':"'IBM Plex Mono',monospace"});
+    t.textContent=labelFn(i); group.appendChild(t);
+    y+=h+gap;
+  }
+  if(count>maxShow){
+    const chip=el('text',{x:cx,y:y+10,'text-anchor':'middle','font-size':11,fill:textColor,'font-family':"'IBM Plex Mono',monospace"});
+    chip.textContent='+ '+(count-maxShow)+' more'; group.appendChild(chip);
+  }
+  svg.appendChild(group);
+}
+
+function bezier(x1,y1,x2,y2){ const dx=(x2-x1)*0.45; return `M ${x1} ${y1} C ${x1+dx} ${y1}, ${x2-dx} ${y2}, ${x2} ${y2}`; }
+
+/* ---------------- continuous ripple flow ---------------- */
+function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign){
+  flowSeq++;
+  const id = 'flow'+flowSeq;
+  const strokeW = mapRange(volumeNorm,0,1,2,12);
+  const tileW = mapRange(volumeNorm,0,1,110,42);
+  const highlight = lighten(colorHex,0.55);
+
+  const grad = el('linearGradient',{id:'grad-'+id, x1:'0', y1:'0', x2:'1', y2:'0'});
+  grad.appendChild(el('stop',{offset:'0%', 'stop-color':colorHex, 'stop-opacity':0.28}));
+  const midStop = el('stop',{offset:'50%', 'stop-color':highlight, 'stop-opacity':0.95});
+  grad.appendChild(midStop);
+  grad.appendChild(el('stop',{offset:'100%', 'stop-color':colorHex, 'stop-opacity':0.28}));
+  defs.appendChild(grad);
+
+  const pattern = el('pattern',{id:'pat-'+id, patternUnits:'userSpaceOnUse', width:tileW, height:strokeW*2, patternTransform:'translate(0,0)'});
+  pattern.appendChild(el('rect',{width:tileW, height:strokeW*2, fill:'url(#grad-'+id+')'}));
+  defs.appendChild(pattern);
+
+  const path = el('path',{d:bezier(x1,y1,x2,y2), fill:'none', stroke:'url(#pat-'+id+')', 'stroke-width':strokeW, 'stroke-linecap':'round'});
+  svg.appendChild(path);
+
+  const speed = mapRange(volumeNorm,0,1,14,90) * dirSign;
+  flows.push({ pattern, tileW, speed, x:0 });
+  return { strokeW };
+}
+
+function addArrow(x,y,dir,color,size){
+  size=size||6;
+  const pts = dir==='left' ? `${x+size},${y-size} ${x},${y} ${x+size},${y+size}` : `${x-size},${y-size} ${x},${y} ${x-size},${y+size}`;
+  svg.appendChild(el('polygon',{points:pts, fill:color}));
+}
+function badge(cx,cy,text){
+  const w = 22 + text.length*6.4;
+  svg.appendChild(el('rect',{x:cx-w/2,y:cy-15,width:w,height:30,rx:15, fill:tok('var(--gray-100)'), opacity:0.94}));
+  const t=el('text',{x:cx,y:cy+4,'text-anchor':'middle','font-size':11.5, fill:'#fff','font-family':"'IBM Plex Mono',monospace"});
+  t.textContent=text; svg.appendChild(t);
+}
+function tag(x,y,text,color){
+  const t=el('text',{x,y,'text-anchor':'middle','font-size':10.5, fill:color, 'font-family':"'IBM Plex Mono',monospace"});
+  t.textContent=text; svg.appendChild(t);
+}
+
+/* ---------------- compute traffic model ---------------- */
+function computeModel(){
+  const traffic = state.traffic;              // TB/mo, customer input
+  const hit = state.hitRatio/100;              // customer input
+  const offloadedTraffic = traffic*hit;        // TB/mo served from cache — derived from the two inputs
+  const originTraffic = traffic-offloadedTraffic; // TB/mo that still reaches backend
+  return { traffic, offloadedTraffic, originTraffic };
+}
+
+/* ---------------- render ---------------- */
+function renderDiagram(){
+  clearSvg();
+  const H=620, midY=H/2;
+  const nodeFill = getComputedStyle(document.documentElement).getPropertyValue('--node-bg');
+  const nodeStroke = getComputedStyle(document.documentElement).getPropertyValue('--node-border');
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
+  const secText = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+  const varnishFill = getComputedStyle(document.documentElement).getPropertyValue('--varnish-fill');
+  const blue60 = getComputedStyle(document.documentElement).getPropertyValue('--blue-60').trim() || '#0763ED';
+
+  const colX = { origin:130, varnish:600, client:1070 };
+  ['Origins','Varnish','Clients'].forEach((t,i)=>{
+    tag([colX.origin,colX.varnish,colX.client][i], 40, t.toUpperCase(), secText);
+  });
+
+  const originNames=[]; for(let i=0;i<state.upstreams;i++) originNames.push(ORIGIN_SOURCES[i%ORIGIN_SOURCES.length]);
+  stackNodes(colX.origin, midY, state.upstreams, 148, 34, 10, 6, i=>originNames[i], nodeFill, nodeStroke, textColor);
+  stackNodes(colX.varnish, midY, state.nodes, 158, 42, 12, 5, i=>'VARNISH-'+(i+1), varnishFill, blue60, textColor);
+  stackNodes(colX.client, midY, state.clients, 100, 30, 8, 6, i=>'client-'+String(i+1).padStart(2,'0'), nodeFill, nodeStroke, textColor);
+
+  const model = computeModel();
+  const maxV = 1000;
+  const clientVol = mapRange(state.traffic,0,maxV,0,1);
+  const originVol = mapRange(model.originTraffic,0,maxV,0,1);
+
+  const teal = tok('var(--teal-50)'), pink = tok('var(--pink-50)'), purple = tok('var(--purple-50)'), blue = tok('var(--blue-50)');
+  const responseColor = mixHex(teal, pink, 1-state.hitRatio/100);
+
+  const spread = 46;
+  const cvReqY = midY-spread, cvResY = midY+spread;
+  const voReqY = midY-spread, voResY = midY+spread;
+
+  // client <-> varnish
+  makeFlowLane(colX.client-53, cvReqY, colX.varnish+82, cvReqY, blue, clientVol, -1);
+  addArrow(colX.varnish+88, cvReqY, 'left', blue, 6);
+  makeFlowLane(colX.varnish+82, cvResY, colX.client-53, cvResY, responseColor, clientVol, 1);
+  addArrow(colX.client-59, cvResY, 'right', responseColor, 6);
+
+  // varnish <-> origin
+  const originColor = state.scenario==='multi_registry' ? purple : pink;
+  makeFlowLane(colX.varnish-82, voReqY, colX.origin+77, voReqY, blue, originVol, -1);
+  addArrow(colX.origin+83, voReqY, 'left', blue, 6);
+  makeFlowLane(colX.origin+77, voResY, colX.varnish-82, voResY, originColor, originVol, 1);
+  addArrow(colX.varnish-88, voResY, 'right', originColor, 6);
+
+  // scenario overlays
+  if(state.scenario==='coalescing'){
+    const nSample = Math.min(state.clients, 8);
+    for(let i=0;i<nSample;i++){
+      const yOff=(i-(nSample-1)/2)*7;
+      const p = el('path',{d:bezier(colX.client-53, midY+yOff+30, colX.varnish+82, midY-46), fill:'none', stroke:blue, 'stroke-width':1.1, 'stroke-dasharray':'2 7', opacity:0.5});
+      svg.appendChild(p);
+    }
+    badge(colX.varnish, midY+112, Math.round(model.originTraffic*10)/10+' TB/mo reaches origin');
+  }
+  if(state.scenario==='multi_registry'){
+    const shown=Math.min(state.upstreams,6);
+    const totalH=shown*34+(shown-1)*10;
+    let y=midY-totalH/2+17;
+    for(let i=0;i<shown;i++){
+      svg.appendChild(el('path',{d:bezier(colX.varnish-82, midY, colX.origin+77, y), fill:'none', stroke:purple, 'stroke-width':1.4, opacity:0.55}));
+      y+=44;
+    }
+  }
+  if(state.scenario==='private_caching'){
+    badge(colX.varnish, midY-118, '🔒 auth-checked');
+  }
+}
+
+/* ---------------- animation ---------------- */
+let lastT = performance.now();
+function tick(now){
+  const dt = Math.min(0.05, (now-lastT)/1000); lastT=now;
+  flows.forEach(f=>{
+    f.x += f.speed*dt;
+    f.x = f.x % f.tileW;
+    f.pattern.setAttribute('patternTransform', `translate(${f.x},0)`);
+  });
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* ---------------- scenario buttons ---------------- */
+const btnWrap = document.getElementById('scenarioBtns');
+Object.keys(SC_LABELS).forEach(key=>{
+  const b=document.createElement('button');
+  b.className='scenario-btn'+(key==='baseline'?' active':'');
+  b.textContent=SC_LABELS[key]; b.dataset.sc=key;
+  b.addEventListener('click', ()=>selectScenario(key));
+  btnWrap.appendChild(b);
+});
+function selectScenario(key){
+  state.scenario=key;
+  document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.toggle('active', b.dataset.sc===key));
+  document.querySelectorAll('.sc-item').forEach(b=>b.classList.toggle('active', b.dataset.sc===key));
+  document.getElementById('topSubtitle').textContent = SC_SUBTITLE[key];
+  refresh();
+}
+document.querySelectorAll('.sc-item').forEach(item=>{
+  item.addEventListener('click', ()=>selectScenario(item.getAttribute('data-sc')));
+});
+
+/* ---------------- controls wiring ---------------- */
+document.querySelectorAll('[data-adj]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const key=btn.getAttribute('data-adj');
+    const delta=parseInt(btn.getAttribute('data-delta'),10);
+    const min={clients:1,nodes:1,upstreams:1}[key];
+    const max={clients:60,nodes:8,upstreams:8}[key];
+    state[key]=Math.max(min,Math.min(max,state[key]+delta));
+    refresh();
+  });
+});
+document.getElementById('sl-traffic').addEventListener('input', e=>{ state.traffic=parseInt(e.target.value,10); refresh(); });
+document.getElementById('sl-hit').addEventListener('input', e=>{ state.hitRatio=parseInt(e.target.value,10); refresh(); });
+
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  state.theme = state.theme==='light'?'dark':'light';
+  document.body.setAttribute('data-theme', state.theme);
+  document.getElementById('themeToggle').textContent = state.theme==='light' ? '◐ dark mode':'◑ light mode';
+  refresh();
+});
+
+/* ---------------- refresh ---------------- */
+function refresh(){
+  document.getElementById('val-clients').textContent = state.clients;
+  document.getElementById('val-nodes').textContent = state.nodes;
+  document.getElementById('val-upstreams').textContent = state.upstreams;
+  document.getElementById('val-traffic').textContent = state.traffic+' TB/mo';
+  document.getElementById('val-hit').textContent = state.hitRatio+'%';
+
+  const model = computeModel();
+  document.getElementById('impactNum').textContent = Math.round(model.offloadedTraffic*10)/10+' TB';
+
+  renderDiagram();
+}
+
+refresh();
+</script>
+</body>
+</html>
