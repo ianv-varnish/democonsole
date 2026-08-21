@@ -691,7 +691,7 @@ const PRODUCTS_COMING_SOON = [];
    ENGINE
    ========================================================================= */
 
-const state = { product:'virtual_registry', scenario:'accelerate', stage:'before', step:0, volume:80, ratio:90, outage:false, theme:'light' };
+const state = { product:'virtual_registry', scenario:'accelerate', step:0, volume:80, ratio:90, outage:false, theme:'light' };
 
 function currentProduct(){ return PRODUCTS[state.product]; }
 function currentScenario(){ return currentProduct().scenarios.find(s=>s.id===state.scenario); }
