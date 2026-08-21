@@ -16,72 +16,89 @@
     --gray-80:#383B40; --gray-85:#25272A; --gray-90:#141415; --gray-100:#0A0A0A;
     --white:#FFFFFF;
     --bg: var(--gray-05); --panel-bg: var(--white); --panel-border: var(--gray-30);
-    --node-bg: var(--gray-20); --node-border: var(--gray-60);
+    --node-bg: var(--white); --node-border: var(--gray-30);
     --text-primary: var(--gray-100); --text-secondary: var(--gray-70);
     --rail-bg: var(--gray-100); --rail-text: var(--gray-10); --rail-text-dim: var(--gray-60);
-    --mid-fill: #E5F2FF;
+    --mid-fill: var(--gray-100); --mid-text: var(--gray-10);
+    --grid-dot: rgba(10,10,10,0.06);
   }
   [data-theme="dark"]{
     --bg: var(--gray-100); --panel-bg: var(--gray-90); --panel-border: var(--gray-80);
     --node-bg: var(--gray-90); --node-border: var(--gray-70);
     --text-primary: var(--gray-10); --text-secondary: var(--gray-50);
-    --mid-fill: #0D2363;
+    --mid-fill: #050608; --mid-text: var(--gray-10);
+    --grid-dot: rgba(255,255,255,0.06);
   }
   *{box-sizing:border-box;}
   body{ margin:0; height:100vh; overflow:hidden; font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
     background:var(--bg); color:var(--text-primary); display:flex; }
-  .mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; }
 
-  .rail{ width:250px; min-width:250px; background:var(--rail-bg); color:var(--rail-text);
+  .rail{ width:240px; min-width:240px; background:var(--rail-bg); color:var(--rail-text);
     display:flex; flex-direction:column; padding:20px 0; height:100vh; overflow-y:auto; }
-  .rail-brand{ padding:0 20px 18px; font-weight:700; font-size:15px; letter-spacing:.02em; }
+  .rail-brand{ padding:0 20px 18px; font-weight:700; font-size:14px; letter-spacing:.03em; }
   .rail-brand span{ color:var(--blue-40); }
-  .rail-section-label{ padding:14px 20px 6px; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  .rail-section-label{ padding:14px 20px 6px; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
     color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace; }
-  .rail-item{ padding:9px 20px; font-size:14px; cursor:pointer; border-left:3px solid transparent;
+  .rail-item{ padding:8px 20px; font-size:13.5px; cursor:pointer; border-left:2px solid transparent;
     color:var(--rail-text-dim); display:flex; align-items:center; justify-content:space-between; gap:8px; }
   .rail-item:hover{ color:var(--rail-text); background:rgba(255,255,255,0.04); }
-  .rail-item.active{ color:var(--white); border-left-color:var(--blue-40); background:rgba(0,140,255,0.14); font-weight:500; }
-  .rail-item .tag{ font-family:'IBM Plex Mono',monospace; font-size:9px; padding:2px 6px; border-radius:4px;
+  .rail-item.active{ color:var(--white); border-left-color:var(--lime-50); background:rgba(180,229,46,0.08); font-weight:500; }
+  .rail-item .tag{ font-family:'IBM Plex Mono',monospace; font-size:8.5px; padding:2px 6px; border-radius:3px;
     background:var(--gray-80); color:var(--rail-text-dim); letter-spacing:.04em; }
   .rail-item.active .tag{ background:var(--blue-60); color:var(--white); }
 
   .main{ flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--panel-border); }
-  .topbar h1{ font-size:18px; font-weight:600; margin:0; }
-  .topbar .subtitle{ font-size:12.5px; color:var(--text-secondary); margin-top:2px; }
+  .topbar h1{ font-size:17px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .topbar .subtitle{ font-size:12px; color:var(--text-secondary); margin-top:2px; }
   .theme-toggle{ border:1px solid var(--panel-border); background:transparent; color:var(--text-primary);
-    border-radius:100px; padding:6px 14px; font-size:12px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+    border-radius:4px; padding:6px 12px; font-size:11px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
 
   .canvas-wrap{ flex:1; position:relative; padding:8px 26px; min-height:0; }
-  .canvas-panel{ background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:20px; height:100%; position:relative; overflow:hidden; }
+  .canvas-panel{ background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:10px; height:100%; position:relative; overflow:hidden; }
   svg{ width:100%; height:100%; display:block; }
 
-  .impact-badge{ position:absolute; top:16px; right:16px; background:var(--gray-100); color:#fff;
-    border-radius:12px; padding:9px 14px; text-align:right; }
-  .impact-badge .num{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:18px; color:var(--blue-30); line-height:1; }
-  .impact-badge .lab{ font-size:9.5px; color:var(--gray-50); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+  .outage-toggle{ position:absolute; top:16px; left:190px; display:flex; align-items:center; gap:7px;
+    background:var(--node-bg); border:1px solid var(--panel-border); border-radius:5px; padding:6px 11px; font-size:10.5px;
+    color:var(--text-secondary); font-family:'IBM Plex Mono',monospace; cursor:pointer; user-select:none; }
+  .outage-toggle .dot{ width:7px; height:7px; border-radius:50%; background:var(--teal-50); }
+  .outage-toggle.on .dot{ background:var(--red); }
+  .outage-toggle.hidden{ display:none; }
 
-  .legend{ position:absolute; bottom:16px; left:16px; display:flex; gap:14px; flex-wrap:wrap;
-    background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:12px; padding:7px 13px; font-size:10.5px; color:var(--text-secondary); }
-  .legend .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+  .step-toggle{ position:absolute; top:16px; left:16px; display:flex; align-items:center; gap:10px;
+    background:var(--node-bg); border:1px solid var(--panel-border); border-radius:5px; padding:6px 10px; }
+  .step-toggle button{ border:none; background:transparent; color:var(--text-primary); font-size:15px; cursor:pointer; line-height:1; padding:2px 6px; }
+  .step-toggle button:disabled{ opacity:0.25; cursor:default; }
+  .step-dots{ display:flex; gap:6px; }
+  .step-dot{ width:7px; height:7px; border-radius:50%; background:var(--panel-border); cursor:pointer; }
+  .step-dot.active{ background:var(--blue-50); }
+
+  .impact-badge{ position:absolute; top:16px; right:16px; background:var(--gray-100); color:#fff;
+    border-radius:5px; padding:8px 13px; text-align:right; }
+  .impact-badge.pain{ background:var(--red); }
+  .impact-badge.good{ background:#0B7A4B; }
+  .impact-badge .num{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:16px; color:var(--blue-30); line-height:1; }
+  .impact-badge.pain .num, .impact-badge.good .num{ color:#fff; }
+  .impact-badge .lab{ font-size:9px; color:var(--gray-50); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+  .impact-badge.pain .lab, .impact-badge.good .lab{ color:rgba(255,255,255,0.75); }
+
+  .legend{ position:absolute; bottom:14px; left:16px; display:flex; gap:12px; flex-wrap:wrap;
+    background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:6px; padding:6px 12px; font-size:10px; color:var(--text-secondary); }
+  .legend .dot{ display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; }
 
   .controls{ border-top:1px solid var(--panel-border); padding:12px 26px 14px; display:flex; flex-direction:column; gap:10px; }
   .controls-row{ display:flex; gap:24px; align-items:flex-end; flex-wrap:wrap; }
   .control-group{ display:flex; flex-direction:column; gap:5px; min-width:110px; }
-  .control-group label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); font-family:'IBM Plex Mono',monospace; }
-  .stepper{ display:flex; align-items:center; gap:8px; }
-  .stepper button{ width:24px; height:24px; border-radius:50%; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:14px; cursor:pointer; line-height:1; }
-  .stepper button:hover{ background:var(--node-bg); }
-  .stepper .val{ min-width:20px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
+  .control-group label{ font-size:9px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); font-family:'IBM Plex Mono',monospace; }
 
-  input[type=range]{ width:130px; accent-color: var(--blue-50); }
+  input[type=range]{ width:150px; accent-color: var(--blue-50); }
   .slider-row{ display:flex; align-items:center; gap:8px; }
-  .slider-row .val{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; min-width:70px; }
+  .slider-row .val{ font-family:'IBM Plex Mono',monospace; font-size:11px; min-width:70px; }
 
-  .scenario-btns{ display:flex; gap:8px; flex-wrap:wrap; }
-  .scenario-btn{ padding:8px 14px; border-radius:100px; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:12px; cursor:pointer; font-weight:500; }
-  .scenario-btn:hover{ background:var(--node-bg); }
+  .scenario-btns{ display:flex; gap:6px; flex-wrap:wrap; }
+  .scenario-btn{ padding:7px 13px; border-radius:4px; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:11.5px; cursor:pointer; font-weight:500; }
+  .scenario-btn:hover{ background:var(--gray-20); }
+  [data-theme="dark"] .scenario-btn:hover{ background:var(--gray-80); }
   .scenario-btn.active{ background:var(--gray-100); color:var(--white); border-color:var(--gray-100); }
   [data-theme="dark"] .scenario-btn.active{ background:var(--blue-50); border-color:var(--blue-50); color:var(--white); }
   .spacer{ flex:1; }
@@ -94,28 +111,34 @@
   <div class="rail-section-label">Products</div>
   <div id="railProducts"></div>
 
-  <div class="rail-section-label" id="railScenariosLabel">Use cases</div>
+  <div class="rail-section-label" id="railScenariosLabel">Mechanisms</div>
   <div id="railScenarios"></div>
 
   <div style="flex:1"></div>
-  <div style="padding:14px 20px; font-size:11px; color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace;">prototype v0.4 — data-driven</div>
+  <div style="padding:14px 20px; font-size:10px; color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace;">prototype v0.5</div>
 </div>
 
 <div class="main">
   <div class="topbar">
     <div>
       <h1 id="topTitle">Virtual Registry</h1>
-      <div class="subtitle" id="topSubtitle">Steady-state traffic</div>
+      <div class="subtitle" id="topSubtitle">Accelerate access</div>
     </div>
-    <button class="theme-toggle" id="themeToggle">◐ dark mode</button>
+    <button class="theme-toggle" id="themeToggle">◐ dark</button>
   </div>
 
   <div class="canvas-wrap">
     <div class="canvas-panel">
       <svg id="diagram" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="outage-toggle hidden" id="outageToggle"><span class="dot"></span><span id="outageToggleLabel">Simulate origin outage</span></div>
+      <div class="step-toggle" id="stepToggle">
+        <button id="stepPrev">‹</button>
+        <div class="step-dots" id="stepDots"></div>
+        <button id="stepNext">›</button>
+      </div>
       <div class="impact-badge">
-        <div class="num" id="impactNum">72 TB</div>
-        <div class="lab" id="impactLab">offloaded / mo</div>
+        <div class="num" id="impactNum">—</div>
+        <div class="lab" id="impactLab">—</div>
       </div>
       <div class="legend" id="legend"></div>
     </div>
@@ -124,78 +147,136 @@
   <div class="controls">
     <div class="controls-row">
       <div class="control-group">
-        <label id="lab-left">Origins</label>
-        <div class="stepper">
-          <button data-adj="upstreams" data-delta="-1">−</button>
-          <span class="val" id="val-upstreams">4</span>
-          <button data-adj="upstreams" data-delta="1">+</button>
-        </div>
-      </div>
-      <div class="control-group">
-        <label id="lab-mid">Varnish nodes</label>
-        <div class="stepper">
-          <button data-adj="nodes" data-delta="-1">−</button>
-          <span class="val" id="val-nodes">2</span>
-          <button data-adj="nodes" data-delta="1">+</button>
-        </div>
-      </div>
-      <div class="control-group">
-        <label id="lab-right">Clients</label>
-        <div class="stepper">
-          <button data-adj="clients" data-delta="-1">−</button>
-          <span class="val" id="val-clients">24</span>
-          <button data-adj="clients" data-delta="1">+</button>
-        </div>
-      </div>
-      <div class="spacer"></div>
-      <div class="control-group">
-        <label>Use case</label>
+        <label>Mechanism</label>
         <div class="scenario-btns" id="scenarioBtns"></div>
       </div>
-    </div>
-
-    <div class="controls-row">
-      <div class="control-group" style="min-width:220px">
+      <div class="spacer"></div>
+      <div class="control-group" id="cg-volume" style="min-width:220px">
         <label id="lab-volume">Monthly traffic volume</label>
         <div class="slider-row">
           <input type="range" id="sl-volume">
           <span class="val" id="val-volume"></span>
         </div>
       </div>
-      <div class="control-group" style="min-width:190px">
+      <div class="control-group" id="cg-ratio" style="min-width:190px">
         <label id="lab-ratio">Cache hit ratio</label>
         <div class="slider-row">
           <input type="range" id="sl-ratio">
           <span class="val" id="val-ratio"></span>
         </div>
       </div>
-      <div class="spacer"></div>
     </div>
   </div>
 </div>
 
 <script>
 /* =========================================================================
-   DATA LAYER — every product and use case lives here. Nothing below this
-   block needs to change to add a new use case, and adding a new product
-   needs at most one new "effect" if its story genuinely needs a new shape.
+   DATA LAYER
+   =========================================================================
+   Everything below describes WHAT to show. The rendering engine (further
+   down this file) never mentions a product or mechanism by name — adding
+   a new one should only ever mean adding data here, not touching render
+   code. If a new mechanism genuinely can't be expressed with the fields
+   below, that's a real engine decision (a new primitive or render mode),
+   not something to hack around in the data.
+
+   ---- Product shape ----
+   {
+     label: 'Display name shown in the rail, topbar, and mid card',
+     tagline: 'SHORT ALL-CAPS LINE SHOWN INSIDE THE MID CARD',
+     tierLabels: { left:'Header above the left column', right:'Header above the right column' },
+     leftGroups / rightGroups: [
+       { label:'Group box title', lines:['line 1 of grey subtext','line 2 (optional)'] }, ...
+     ],
+     metrics: {
+       volume: { label, unit, min, max, step, default },   // the "how much" slider
+       ratio:  { label, unit, min, max, step, default }    // the "what fraction" slider
+     },
+     model: { divertedLabel, beforeLabel },   // see "The volume/ratio model" below
+     responseBlend: { colorA, colorB, weightSource:'passthrough'|'diverted' },
+     legend: [ { color:'token-name', label:'...' }, ... ],  // color tokens: blue-50, teal-50,
+                                                             // pink-50, purple-50, red, lime-50
+     scenarios: [ ...see below... ]
+   }
+
+   ---- The volume/ratio model ----
+   Every generic scenario shares one computation: diverted = volume * (ratio/100),
+   passthrough = volume - diverted. "diverted" is always the good outcome the
+   mechanism produces (offloaded, blocked, monetized...) — what that means in
+   plain English is supplied per-product via model.divertedLabel, and can be
+   overridden per-scenario (scenario.divertedLabel) when one product mixes
+   different kinds of mechanisms (e.g. Enterprise blends an "offload" story
+   and a "block malicious traffic" story under one roof).
+
+   ---- Scenario shape (the generic 3-step case — most mechanisms) ----
+   {
+     id: 'unique_within_product',
+     label: 'Shown on buttons, rail, and inside the mid card',
+     painLabel: 'One sentence: what goes wrong without this product.',
+     benefitLabel: 'One sentence: the payoff once this mechanism is engaged.',
+     transitionLabel: 'Optional override for the generic step-2 caption.',
+     effects: [ {type:'badge', text:(model)=>'🔒 short label', position:'aboveMid'} ]
+              // or {type:'blockGate', style:'danger'|'quarantine', divertedLabel:'...'}
+              // or {type:'fanout'} — fans lines out to each left-hand group
+              // effects only ever apply at step 3 ("mechanism engaged")
+
+     // Optional per-scenario overrides — omit unless this mechanism genuinely differs:
+     originColorOverride: 'color-token',           // recolors the origin-bound flow at step 3
+     responseBlendOverride: { colorB:'red' },       // partial override of product.responseBlend
+     divertedLabel: 'blocked / mo',                 // overrides product.model.divertedLabel
+     metricsOverride: { ratio:{ label:'...', default:8 } },  // relabel/rescale a slider just
+                                                              // for this scenario; add hidden:true
+                                                              // to hide a slider that doesn't apply
+
+     // Resilience toggle (only for mechanisms that are literally about surviving a failure):
+     supportsOutageToggle: true,
+     toggleOffText / toggleOnText / offlineLabel / goodLabel / beforeFailNum / beforeFailLabel /
+     resilientStatusText   // all optional; sensible defaults exist for all of them
+   }
+
+   ---- Scenario shape (bespoke multi-step sequence — e.g. quarantine) ----
+   Use this only when a mechanism is a genuine process over time (a fork, a
+   wait state, a multi-party handshake) that the generic 3-beat pain →
+   transition → mechanism arc can't represent honestly.
+   {
+     id, label,
+     steps: [
+       { caption:'One sentence for this beat.', render(ctx){ ...draw with the
+         primitives below using ctx.colX / ctx.midY / ctx.leftCenters /
+         ctx.rightCenters / ctx.boxW / ctx.boxH... } },
+       ...
+     ]
+   }
+   Presence of `steps` is what tells the engine this is a bespoke sequence —
+   don't also set a render mode flag.
+
+   ---- Scenario shape (chart — currently just Ora Streaming) ----
+   { id, label, painLabel, benefitLabel, transitionLabel,
+     renderMode:'chart', chartType:'cost'|'loadbalance',
+     metricsOverride: { ... } }        // charts usually repurpose or hide a slider
+
    ========================================================================= */
 
-const ORIGIN_SOURCES = ['JFrog Artifactory','Sonatype Nexus','Docker Hub','npm Registry','PyPI','Maven Central','Amazon ECR','Google Artifact Registry','Azure Container Registry','S3-backed store'];
-
 const PRODUCTS = {
-
   virtual_registry: {
     label: 'Virtual Registry',
-    tierLabels: { left:'Origins', mid:'Varnish', right:'Clients' },
-    leftNodeNames: ORIGIN_SOURCES,
-    midNodeLabel: i => 'VARNISH-'+(i+1),
-    rightNodeLabel: i => 'client-'+String(i+1).padStart(2,'0'),
+    tagline: 'ONE CACHE FOR EVERY REGISTRY',
+    tierLabels: { left:'Sources', right:'Consumers' },
+    leftGroups: [
+      { label:'Public registries', lines:['Docker · npm · PyPI','Go · Maven · Cargo'] },
+      { label:'Private repositories', lines:['JFrog · Sonatype Nexus','Cloudsmith · Harbor'] },
+      { label:'Source code', lines:['GitHub · GitLab'] }
+    ],
+    rightGroups: [
+      { label:'CI workers', lines:['GitHub Actions · GitLab CI','CircleCI'] },
+      { label:'CD workers', lines:['Argo CD · Flux CD','Octopus Deploy'] },
+      { label:'Developers', lines:['Local builds & IDEs'] }
+    ],
     metrics: {
       volume: { label:'Monthly traffic volume', unit:'TB/mo', min:1, max:1000, step:1, default:80 },
       ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:5, default:90 }
     },
-    model: { divertedLabel:'offloaded / mo', passthroughLabel:'reaches origin' },
+    model: { divertedLabel:'offloaded / mo', beforeLabel:'direct to origin' },
     responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
     legend: [
       { color:'blue-50', label:'Request' },
@@ -204,28 +285,417 @@ const PRODUCTS = {
       { color:'purple-50', label:'Routing' }
     ],
     scenarios: [
-      { id:'baseline', label:'Steady-state', subtitle:'Steady-state traffic', effects: [] },
-      { id:'coalescing', label:'Cache miss + coalescing', subtitle:'Cache miss + request coalescing', responseFixed:'pink-50', effects: [ {type:'funnel'} ] },
-      { id:'multi_registry', label:'Many registries', subtitle:'One endpoint, many registries', originColorOverride:'purple-50', effects: [ {type:'fanout'} ] },
-      { id:'private_caching', label:'Private caching', subtitle:'Auth-preserving private caching', effects: [ {type:'badge', text: () => '🔒 auth-checked', position:'aboveMid'} ] }
+      {
+        id:'accelerate', label:'Accelerate access',
+        painLabel:'Every request hits every registry directly. Origin absorbs 100% of traffic.',
+        benefitLabel:'Repeated pulls are served in milliseconds — origin barely notices your build traffic.',
+        effects: []
+      },
+      {
+        id:'route', label:'Route intelligently',
+        painLabel:'One integration per registry, per team — duplicated config, duplicated risk.',
+        benefitLabel:'One virtual endpoint, every registry behind it — no per-team integration sprawl.',
+        originColorOverride:'purple-50', effects: [ {type:'fanout'} ]
+      },
+      {
+        id:'preserve_auth', label:'Preserve authentication',
+        painLabel:'Every client authenticates and fetches independently. No shared cache, no shared benefit.',
+        benefitLabel:'One shared cache, fully auth-checked — no duplicated fetches per developer.',
+        effects: [ {type:'badge', text: () => '🔒 auth-checked', position:'aboveMid'} ]
+      },
+      {
+        id:'outages', label:'Serve during outages',
+        painLabel:'Origin goes down. Every pull fails. Every build breaks.',
+        benefitLabel:'Origin goes down, builds don\'t — cached artifacts keep flowing without interruption.',
+        supportsOutageToggle:true,
+        effects: []
+      }
+    ]
+  },
+
+  artifact_firewall: {
+    label: 'Artifact Firewall',
+    tagline: 'ALLOW · DENY · HIDE · QUARANTINE',
+    tierLabels: { left:'Sources', right:'Consumers' },
+    leftGroups: [
+      { label:'Public registries', lines:['npm · PyPI','Maven · NuGet'] },
+      { label:'Vulnerability intel', lines:['OSV.dev · GH Advisories','PyPA · RustSec'] },
+      { label:'Policy rules', lines:['YAML rulesets via Git'] }
+    ],
+    rightGroups: [
+      { label:'CI/CD pipelines', lines:['GitHub Actions · GitLab CI','Jenkins · CircleCI'] },
+      { label:'Kubernetes clusters', lines:['Runtime package pulls'] },
+      { label:'Developers & AI agents', lines:['Local builds, IDEs, agents'] }
+    ],
+    metrics: {
+      volume: { label:'Monthly package requests', unit:'K req/mo', min:1, max:500, step:1, default:50 },
+      ratio:  { label:'Policy block rate', unit:'%', min:0, max:100, step:1, default:4 }
+    },
+    model: { divertedLabel:'blocked / mo', beforeLabel:'unfiltered' },
+    responseBlend: { colorA:'teal-50', colorB:'red', weightSource:'diverted' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Allowed' },
+      { color:'red', label:'Blocked' },
+      { color:'purple-50', label:'Quarantined' }
+    ],
+    scenarios: [
+      {
+        id:'block_known', label:'Block known threats',
+        painLabel:'Vulnerable versions are pulled straight into builds — scanners flag it only after the fact, already inside.',
+        benefitLabel:'Vulnerable versions are stopped at the door — they never reach a build.',
+        originColorOverride:'teal-50', effects: [ {type:'blockGate', style:'danger'} ]
+      },
+      {
+        id:'quarantine_unknown', label:'Quarantine unknowns',
+        steps: [
+          {
+            caption:'A new version publishes through the normal, signed release path.',
+            render(ctx){
+              const { colX, midY, leftCenters, boxW, boxH } = ctx;
+              ringHighlight(colX.left, leftCenters[0], boxW, boxH, tok('blue-50'));
+              badge(colX.left, leftCenters[0]-boxH/2-14, 'v2.4.1 published');
+              svg.appendChild(el('path',{d:bezier(colX.left+boxW/2+5, leftCenters[0], colX.mid-70, midY), fill:'none', stroke:tok('blue-50'), 'stroke-width':1.6, 'stroke-dasharray':'3 5', opacity:0.8}));
+            }
+          },
+          {
+            caption:'Firewall neither allows nor denies it. It quarantines the version for a configurable window while the community has time to flag it.',
+            render(ctx){
+              const { colX, midY, rightCenters, boxW } = ctx;
+              drawClockIcon(colX.mid, midY-70, tok('purple-50'));
+              badge(colX.mid, midY-40, 'QUARANTINED · 24H WINDOW', 'quarantine');
+              rightCenters.forEach(cy=>{ makeFlowLane(colX.right-boxW/2-5, cy, colX.mid+70, midY, tok('blue-50'), 0.4, -1); });
+              badge(colX.right, rightCenters[0]-40, 'requests waiting');
+            }
+          },
+          {
+            caption:'Outcome A — the window closes clean: released to every consumer, right on schedule.',
+            render(ctx){
+              const { colX, midY, leftCenters, rightCenters } = ctx;
+              badge(colX.mid, midY-40, '✓ released', 'good');
+              makeFlowLane(colX.left+112, midY-14, colX.mid-70, midY-14, tok('teal-50'), 0.5, 1);
+              rightCenters.forEach(cy=>{ makeFlowLane(colX.mid+70, midY, colX.right-112, cy, tok('teal-50'), 0.6, 1); });
+            }
+          },
+          {
+            caption:'Outcome B — a vulnerability report arrives during the window: blocked before a single build pulls it.',
+            render(ctx){
+              const { colX, midY, rightCenters } = ctx;
+              svg.appendChild(el('line',{x1:colX.mid-9,y1:midY-49,x2:colX.mid+9,y2:midY-31,stroke:tok('red'),'stroke-width':2.4}));
+              svg.appendChild(el('line',{x1:colX.mid-9,y1:midY-31,x2:colX.mid+9,y2:midY-49,stroke:tok('red'),'stroke-width':2.4}));
+              badge(colX.mid, midY-14, 'BLOCKED', 'danger');
+              rightCenters.forEach(cy=>{ makeFlowLane(colX.mid+70, midY, colX.right-112, cy, tok('red'), 0.4, 1, 0.6); });
+            }
+          }
+        ]
+      },
+      {
+        id:'namespace_isolation', label:'Isolate namespaces',
+        painLabel:'An internal package name is spoofed on the public registry — builds can silently pull the attacker\'s version instead of yours.',
+        benefitLabel:'Your internal package names can\'t be spoofed — public lookups are blocked outright.',
+        originColorOverride:'teal-50', effects: [ {type:'badge', text: () => '🔒 internal scope protected', position:'aboveMid'} ]
+      },
+      {
+        id:'policy_as_code', label:'Policy as code',
+        painLabel:'Dependency policy lives in someone\'s head or a wiki page — no audit trail, no way to prove what was blocked, or why.',
+        benefitLabel:'Every allow, deny, and hide decision is versioned, reviewed, and auditable.',
+        originColorOverride:'teal-50', effects: [ {type:'badge', text: () => '📝 Git-versioned rules', position:'aboveMid'} ]
+      }
+    ]
+  },
+
+  ora_streaming: {
+    label: 'Ora Streaming',
+    tagline: '$/GBPS, NOT $/GB',
+    tierLabels: { left:'Origin / packager', right:'Viewers' },
+    leftGroups: [
+      { label:'Live encoders', lines:['RTMP · SRT ingest'] },
+      { label:'VoD origin', lines:['Long-tail libraries'] }
+    ],
+    rightGroups: [
+      { label:'Global audience', lines:['Smart TVs · mobile · web'] }
+    ],
+    metrics: {
+      volume: { label:'Monthly traffic volume', unit:'TB/mo', min:5, max:500, step:5, default:75 },
+      ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:5, default:92 }
+    },
+    model: { divertedLabel:'served from edge / mo', beforeLabel:'direct to origin' },
+    responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Served from edge' },
+      { color:'pink-50', label:'Origin fetch' },
+      { color:'red', label:'Blocked' }
+    ],
+    scenarios: [
+      {
+        id:'isolation', label:'Bare-metal isolation',
+        painLabel:"Other tenants' traffic spikes saturate shared edge nodes — your stream buffers for reasons that have nothing to do with you.",
+        benefitLabel:"Dedicated bare-metal capacity — your stream never competes for someone else's spike.",
+        effects: []
+      },
+      {
+        id:'predictable_cost', label:'Predictable flat-fee billing',
+        painLabel:'Variable $/GB pricing means your bill grows every time your audience does.',
+        transitionLabel:'Ora enters with a fixed monthly fee, decoupled from traffic.',
+        benefitLabel:'Every TB past the crossover point is capacity you already paid for.',
+        renderMode:'chart', chartType:'cost',
+        metricsOverride: { ratio:{ hidden:true } }
+      },
+      {
+        id:'load_balancing', label:'Strategic load balancing',
+        painLabel:'A traffic spike during a live event means paying premium overage, or the stream buffers.',
+        transitionLabel:'Ora provisions dedicated capacity ahead of demand.',
+        benefitLabel:'Peak demand is absorbed without a single dropped frame.',
+        renderMode:'chart', chartType:'loadbalance',
+        metricsOverride: { volume:{ hidden:true }, ratio:{ label:'Peak demand multiplier', unit:'x', min:100, max:400, step:10, default:220 } }
+      },
+      {
+        id:'edge_security', label:'Built-in edge security',
+        painLabel:'Bots, scrapers and token-cloning attempts reach your streams directly, undetected.',
+        benefitLabel:'Bots and token-cloning attempts are stopped at the edge, before they touch a stream.',
+        originColorOverride:'teal-50', divertedLabel:'blocked / mo',
+        metricsOverride: { ratio:{ label:'Malicious request rate', default:7 } },
+        effects: [ {type:'blockGate', style:'danger', divertedLabel:'blocked / mo'} ]
+      }
+    ]
+  },
+
+  varnish_cdn: {
+    label: 'Varnish CDN',
+    tagline: 'SOVEREIGN BY DESIGN',
+    tierLabels: { left:'Origin', right:'EU consumers' },
+    leftGroups: [
+      { label:'Application origins', lines:['APIs · dynamic web apps'] },
+      { label:'Static & media origins', lines:['Assets · images · downloads'] }
+    ],
+    rightGroups: [
+      { label:'European end users', lines:['Web · mobile'] },
+      { label:'API & partner clients', lines:['B2B integrations'] }
+    ],
+    metrics: {
+      volume: { label:'Monthly traffic volume', unit:'GB/mo', min:50, max:5000, step:50, default:400 },
+      ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:5, default:88 }
+    },
+    model: { divertedLabel:'served at edge / mo', beforeLabel:'direct to origin' },
+    responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Served at edge' },
+      { color:'pink-50', label:'Origin fetch' },
+      { color:'red', label:'Blocked' }
+    ],
+    scenarios: [
+      {
+        id:'sovereign_routing', label:'Sovereign routing',
+        painLabel:'Traffic silently routes through infrastructure exposed to foreign legal jurisdiction — even when data is stored in the EU.',
+        benefitLabel:'Traffic never leaves EU jurisdiction — nothing to explain to a compliance auditor.',
+        effects: [ {type:'badge', text: () => '🇪🇺 EU-only routing', position:'aboveMid'} ]
+      },
+      {
+        id:'managed_waf', label:'Managed WAF',
+        painLabel:'Application-layer attacks reach your origin directly — there is no managed rule set in front of it.',
+        benefitLabel:'Application-layer attacks are stopped before they ever reach your origin.',
+        originColorOverride:'teal-50', divertedLabel:'attacks blocked / mo',
+        responseBlendOverride:{ colorB:'red' },
+        metricsOverride: { ratio:{ label:'Malicious request rate', default:6 } },
+        effects: [ {type:'blockGate', style:'danger', divertedLabel:'attacks blocked / mo'} ]
+      },
+      {
+        id:'bot_defense', label:'Bot & fraud defense',
+        painLabel:'Scrapers and credential-stuffing bots hit your origin at full request volume, indistinguishable from real users.',
+        benefitLabel:'Scrapers and credential-stuffing attempts are filtered out at the edge.',
+        originColorOverride:'teal-50', divertedLabel:'bot requests stopped / mo',
+        responseBlendOverride:{ colorB:'purple-50' },
+        metricsOverride: { ratio:{ label:'Bot traffic share', default:22 } },
+        effects: [ {type:'blockGate', style:'quarantine', divertedLabel:'bot requests stopped / mo'} ]
+      },
+      {
+        id:'observability', label:'Real-time observability',
+        painLabel:'Cache issues surface only when a customer complains — no visibility, no fast rollback.',
+        benefitLabel:'Cache issues surface in real time, and a bad purge is one click to fix.',
+        effects: [ {type:'badge', text: () => '📊 live metrics · 1-click purge', position:'aboveMid'} ]
+      }
+    ]
+  },
+
+  ai_accelerator: {
+    label: 'Varnish AI Accelerator',
+    tagline: 'FETCH ONCE. SERVE AT GPU SPEED.',
+    tierLabels: { left:'Object storage', right:'Compute' },
+    leftGroups: [
+      { label:'Cloud object storage', lines:['S3 · GCS · Azure'] },
+      { label:'On-prem / hybrid stores', lines:['NFS · HDFS'] }
+    ],
+    rightGroups: [
+      { label:'GPU training clusters', lines:['Multi-epoch training runs'] },
+      { label:'Inference & serving', lines:['Low-latency model serving'] }
+    ],
+    metrics: {
+      volume: { label:'Dataset size', unit:'TB', min:5, max:2000, step:5, default:200 },
+      ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:1, default:90 }
+    },
+    model: { divertedLabel:'served from cache / epoch', beforeLabel:'reaches object storage' },
+    responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Served from cache' },
+      { color:'pink-50', label:'Object storage read' }
+    ],
+    scenarios: [
+      {
+        id:'tiered_caching', label:'Tiered caching',
+        painLabel:'Every epoch re-reads the same dataset from object storage — GPUs sit idle waiting on ~120ms first-byte latency.',
+        benefitLabel:'Fetch once, serve every epoch after — GPUs stay fed instead of waiting.',
+        effects: []
+      },
+      {
+        id:'prefetch', label:'Prefetch & prefill',
+        painLabel:'Inference workloads cold-start every time, waiting on storage before serving the first request.',
+        benefitLabel:'Data is staged before compute asks — inference starts instantly, no cold start.',
+        effects: [ {type:'badge', text: () => '⚡ staged before compute asks', position:'aboveMid'} ]
+      },
+      {
+        id:'posix_mount', label:'POSIX filesystem mount',
+        painLabel:'Pipelines built for local files cannot point at object storage without a rewrite.',
+        benefitLabel:'Existing pipelines point at the cache like any local path — no rewrite needed.',
+        effects: [ {type:'badge', text: () => '📁 mounts like a local filesystem', position:'aboveMid'} ]
+      },
+      {
+        id:'cache_policy', label:'Customizable cache policy',
+        painLabel:'One-size-fits-all caching wastes fast storage on cold data, or evicts hot data too early.',
+        benefitLabel:'TTLs and eviction are tuned to your workload — fast storage isn\'t wasted on cold data.',
+        effects: [ {type:'badge', text: () => '⚙ TTL · eviction · tier-promotion', position:'aboveMid'} ]
+      }
+    ]
+  },
+
+  cdn_in_a_box: {
+    label: 'Varnish CDN in a Box',
+    tagline: 'YOUR BRAND. YOUR MARGIN.',
+    tierLabels: { left:'Varnish provides', right:'Your customers' },
+    leftGroups: [
+      { label:'Engine & control plane', lines:['Varnish Enterprise core'] },
+      { label:'Ops & compliance', lines:['24/7 monitoring · NIS2/ISO'] }
+    ],
+    rightGroups: [
+      { label:'Enterprise B2B customers', lines:['Onboarded self-service'] }
+    ],
+    metrics: {
+      volume: { label:'Committed capacity', unit:'Gbps', min:1, max:200, step:1, default:40 },
+      ratio:  { label:'Idle capacity you can monetize', unit:'%', min:0, max:100, step:5, default:35 }
+    },
+    model: { divertedLabel:'monetized / mo', beforeLabel:'sitting idle, unmonetized' },
+    responseBlend: { colorA:'pink-50', colorB:'teal-50', weightSource:'diverted' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Monetized' },
+      { color:'pink-50', label:'Still idle' },
+      { color:'red', label:'Blocked' }
+    ],
+    scenarios: [
+      {
+        id:'turnkey', label:'Turnkey deployment',
+        painLabel:'Building in-house means years of engineering and a full capex commitment before your first customer.',
+        benefitLabel:'Your branded CDN is live on your own PoPs in days, not years.',
+        effects: [ {type:'badge', text: () => '🚀 live on your PoPs in days', position:'aboveMid'} ]
+      },
+      {
+        id:'white_label', label:'White-label self-service',
+        painLabel:'Customers onboard through your sales team and a spreadsheet — no self-service, no scale.',
+        benefitLabel:'Customers self-onboard through your portal — no sales call required.',
+        effects: [ {type:'badge', text: () => '🎨 your brand, your portal', position:'aboveMid'} ]
+      },
+      {
+        id:'managed_security', label:'Managed edge security',
+        painLabel:'Offering a CDN product without WAF or DDoS protection puts your customers — and your reputation — at risk.',
+        benefitLabel:'Attacks are stopped before they ever reach a customer\'s traffic.',
+        originColorOverride:'teal-50', divertedLabel:'attacks blocked / mo',
+        responseBlendOverride:{ colorA:'teal-50', colorB:'red', weightSource:'diverted' },
+        metricsOverride: { ratio:{ label:'Malicious request rate', default:6 } },
+        effects: [ {type:'blockGate', style:'danger', divertedLabel:'attacks blocked / mo'} ]
+      },
+      {
+        id:'revenue_share', label:'Revenue share, no capex',
+        painLabel:'Idle network capacity earns nothing sitting on the shelf.',
+        benefitLabel:'Idle capacity becomes a billable product — no capex required.',
+        effects: []
+      }
+    ]
+  },
+
+  varnish_enterprise: {
+    label: 'Varnish Enterprise',
+    tagline: 'ONE PROGRAMMABLE EDGE LAYER',
+    tierLabels: { left:'Origin backend', right:'Users & API clients' },
+    leftGroups: [
+      { label:'Application backends', lines:['APIs · dynamic web apps'] },
+      { label:'Video & media origins', lines:['Live streams · VoD libraries'] }
+    ],
+    rightGroups: [
+      { label:'Web & mobile users', lines:['Browsers · apps'] },
+      { label:'API & platform clients', lines:['Partners · internal services'] }
+    ],
+    metrics: {
+      volume: { label:'Monthly traffic volume', unit:'TB/mo', min:5, max:2000, step:5, default:150 },
+      ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:5, default:92 }
+    },
+    model: { divertedLabel:'served at edge / mo', beforeLabel:'direct to origin' },
+    responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Served at edge' },
+      { color:'pink-50', label:'Origin fetch' },
+      { color:'red', label:'Blocked' }
+    ],
+    scenarios: [
+      {
+        id:'mse', label:'Massive Storage Engine',
+        painLabel:'RAM-only cache evicts your hot working set before it is reused — origin absorbs the overflow.',
+        benefitLabel:'Multi-terabyte working sets stay cached on disk — origin sees a fraction of the traffic.',
+        effects: []
+      },
+      {
+        id:'ha_clustering', label:'High availability & clustering',
+        painLabel:'A single-node cache means a backend hiccup sends 100% of traffic straight through, cold.',
+        benefitLabel:'A backend hiccup is absorbed by the cluster — traffic never feels it.',
+        supportsOutageToggle:true,
+        toggleOffText:'Simulate a backend disruption', toggleOnText:'Disruption contained',
+        offlineLabel:'DEGRADED', goodLabel:'requests degraded',
+        beforeFailNum:'100%', beforeFailLabel:'traffic exposed',
+        resilientStatusText:'SERVED FROM CLUSTER',
+        effects: []
+      },
+      {
+        id:'security', label:'Security tooling',
+        painLabel:'Malicious and bot traffic reaches your origin directly, consuming backend capacity meant for real users.',
+        benefitLabel:'Malicious and bot traffic is stopped at the edge, before it costs backend capacity.',
+        originColorOverride:'teal-50', divertedLabel:'blocked / mo',
+        responseBlendOverride:{ colorB:'red' },
+        metricsOverride: { ratio:{ label:'Malicious/bot traffic %', default:8 } },
+        effects: [ {type:'blockGate', style:'danger', divertedLabel:'blocked / mo'} ]
+      },
+      {
+        id:'edge_logic', label:'Programmable edge logic',
+        painLabel:'Auth checks, geo-routing and page assembly all run at the app layer — adding backend load to every single request.',
+        benefitLabel:'Auth, geo-routing, and page assembly all run at the edge — origin does less work.',
+        effects: [ {type:'badge', text: () => '⚙ VCL: auth · geo · assembly', position:'aboveMid'} ]
+      }
     ]
   }
-
 };
 
-const PRODUCTS_COMING_SOON = ['Artifact Firewall','Ora Streaming','Varnish CDN','Varnish AI Accelerator','Varnish Enterprise'];
+const PRODUCTS_COMING_SOON = [];
 
 /* =========================================================================
-   ENGINE — generic. Reads PRODUCTS + current state, knows nothing about
-   any specific product or use case by name.
+   ENGINE
    ========================================================================= */
 
-const state = { product:'virtual_registry', scenario:'baseline', clients:24, nodes:2, upstreams:4, volume:80, ratio:90, theme:'light' };
+const state = { product:'virtual_registry', scenario:'accelerate', stage:'before', step:0, volume:80, ratio:90, outage:false, theme:'light' };
 
 function currentProduct(){ return PRODUCTS[state.product]; }
 function currentScenario(){ return currentProduct().scenarios.find(s=>s.id===state.scenario); }
 
-/* ---- color helpers ---- */
 function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue('--'+name).trim(); }
 function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return [n>>16&255,n>>8&255,n&255]; }
 function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join(''); }
@@ -233,51 +703,51 @@ function mixHex(a,b,t){ const A=hexToRgb(a),B=hexToRgb(b); return rgbToHex(A[0]+
 function lighten(hex,amt){ return mixHex(hex,'#ffffff',amt); }
 function mapRange(v,i0,i1,o0,o1){ v=Math.max(i0,Math.min(i1,v)); return o0+(v-i0)/(i1-i0)*(o1-o0); }
 
-/* ---- svg core ---- */
 const svg = document.getElementById('diagram');
 const NS='http://www.w3.org/2000/svg';
 function el(tag,attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
 let defs, flows=[], flowSeq=0;
 function clearSvg(){ while(svg.firstChild) svg.removeChild(svg.firstChild); defs=el('defs',{}); svg.appendChild(defs); flows=[]; }
 
-function stackNodes(cx, topY, count, w, h, gap, maxShow, labelFn, fill, stroke, textColor){
-  const group=el('g',{});
-  const shown=Math.min(count,maxShow);
-  const totalH=shown*h+(shown-1)*gap;
-  let y=topY-totalH/2;
-  for(let i=0;i<shown;i++){
-    group.appendChild(el('rect',{x:cx-w/2,y:y,width:w,height:h,rx:14,fill:fill,stroke:stroke,'stroke-width':1.4}));
-    const t=el('text',{x:cx,y:y+h/2+4,'text-anchor':'middle','font-size':11,fill:textColor,'font-family':"'IBM Plex Mono',monospace"});
-    t.textContent=labelFn(i); group.appendChild(t);
-    y+=h+gap;
-  }
-  if(count>maxShow){
-    const chip=el('text',{x:cx,y:y+10,'text-anchor':'middle','font-size':11,fill:textColor,'font-family':"'IBM Plex Mono',monospace"});
-    chip.textContent='+ '+(count-maxShow)+' more'; group.appendChild(chip);
-  }
-  svg.appendChild(group);
+function drawGridBackdrop(){
+  const pat = el('pattern',{id:'dotgrid', width:26, height:26, patternUnits:'userSpaceOnUse'});
+  pat.appendChild(el('circle',{cx:1.5, cy:1.5, r:1.1, fill:tok('grid-dot')}));
+  defs.appendChild(pat);
+  svg.appendChild(el('rect',{x:0,y:0,width:1200,height:620,fill:'url(#dotgrid)'}));
+}
+
+function drawGroupBox(cx, cy, w, h, label, lines, textColor, secText, dim){
+  const g = el('g',{opacity: dim?0.35:1});
+  g.appendChild(el('rect',{x:cx-w/2, y:cy-h/2, width:w, height:h, rx:5, fill:tok('node-bg'), stroke:tok('node-border'), 'stroke-width':1}));
+  const title = el('text',{x:cx, y:cy-h/2+20, 'text-anchor':'middle', 'font-size':12.5, 'font-weight':600, fill:textColor, 'font-family':"'Inter',sans-serif"});
+  title.textContent = label; g.appendChild(title);
+  lines.forEach((line,i)=>{
+    const t = el('text',{x:cx, y:cy-h/2+40+i*16, 'text-anchor':'middle', 'font-size':10.5, fill:secText, 'font-family':"'Inter',sans-serif"});
+    t.textContent = line; g.appendChild(t);
+  });
+  svg.appendChild(g);
 }
 
 function bezier(x1,y1,x2,y2){ const dx=(x2-x1)*0.45; return `M ${x1} ${y1} C ${x1+dx} ${y1}, ${x2-dx} ${y2}, ${x2} ${y2}`; }
 
-function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign){
+function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign, opacity){
   flowSeq++;
   const id='flow'+flowSeq;
-  const strokeW = mapRange(volumeNorm,0,1,2,12);
+  const strokeW = mapRange(volumeNorm,0,1,1.6,9);
   const tileW = mapRange(volumeNorm,0,1,110,42);
   const highlight = lighten(colorHex,0.55);
 
   const grad = el('linearGradient',{id:'grad-'+id, x1:'0', y1:'0', x2:'1', y2:'0'});
-  grad.appendChild(el('stop',{offset:'0%', 'stop-color':colorHex, 'stop-opacity':0.28}));
+  grad.appendChild(el('stop',{offset:'0%', 'stop-color':colorHex, 'stop-opacity':0.25}));
   grad.appendChild(el('stop',{offset:'50%', 'stop-color':highlight, 'stop-opacity':0.95}));
-  grad.appendChild(el('stop',{offset:'100%', 'stop-color':colorHex, 'stop-opacity':0.28}));
+  grad.appendChild(el('stop',{offset:'100%', 'stop-color':colorHex, 'stop-opacity':0.25}));
   defs.appendChild(grad);
 
   const pattern = el('pattern',{id:'pat-'+id, patternUnits:'userSpaceOnUse', width:tileW, height:strokeW*2, patternTransform:'translate(0,0)'});
   pattern.appendChild(el('rect',{width:tileW, height:strokeW*2, fill:'url(#grad-'+id+')'}));
   defs.appendChild(pattern);
 
-  const path = el('path',{d:bezier(x1,y1,x2,y2), fill:'none', stroke:'url(#pat-'+id+')', 'stroke-width':strokeW, 'stroke-linecap':'round'});
+  const path = el('path',{d:bezier(x1,y1,x2,y2), fill:'none', stroke:'url(#pat-'+id+')', 'stroke-width':strokeW, 'stroke-linecap':'round', opacity: opacity==null?1:opacity});
   svg.appendChild(path);
 
   const speed = mapRange(volumeNorm,0,1,14,90) * dirSign;
@@ -285,121 +755,353 @@ function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign){
 }
 
 function addArrow(x,y,dir,color,size){
-  size=size||6;
+  size=size||5.5;
   const pts = dir==='left' ? `${x+size},${y-size} ${x},${y} ${x+size},${y+size}` : `${x-size},${y-size} ${x},${y} ${x-size},${y+size}`;
   svg.appendChild(el('polygon',{points:pts, fill:color}));
 }
 function badge(cx,cy,text,style){
-  const bg = style==='danger' ? tok('red') : tok('gray-100');
-  const w = 22 + text.length*6.4;
-  svg.appendChild(el('rect',{x:cx-w/2,y:cy-15,width:w,height:30,rx:15, fill:bg, opacity:0.95}));
-  const t=el('text',{x:cx,y:cy+4,'text-anchor':'middle','font-size':11.5, fill:'#fff','font-family':"'IBM Plex Mono',monospace"});
+  const bg = style==='danger' ? tok('red') : style==='good' ? '#0B7A4B' : style==='quarantine' ? tok('purple-50') : tok('gray-100');
+  const w = 20 + text.length*6.2;
+  svg.appendChild(el('rect',{x:cx-w/2,y:cy-14,width:w,height:28,rx:5, fill:bg, opacity:0.96}));
+  const t=el('text',{x:cx,y:cy+4,'text-anchor':'middle','font-size':11, fill:'#fff','font-family':"'IBM Plex Mono',monospace"});
   t.textContent=text; svg.appendChild(t);
 }
-function tagText(x,y,text,color){
-  const t=el('text',{x,y,'text-anchor':'middle','font-size':10.5, fill:color, 'font-family':"'IBM Plex Mono',monospace"});
-  t.textContent=text; svg.appendChild(t);
+function tagText(x,y,text,color,size){
+  const t=el('text',{x,y,'text-anchor':'middle','font-size':size||10, fill:color, 'font-family':"'IBM Plex Mono',monospace",'letter-spacing':'0.05em'});
+  t.textContent=text.toUpperCase(); svg.appendChild(t);
+}
+function ringHighlight(cx,cy,w,h,color){
+  svg.appendChild(el('rect',{x:cx-w/2-4,y:cy-h/2-4,width:w+8,height:h+8,rx:8, fill:'none', stroke:color,'stroke-width':2,'stroke-dasharray':'4 3'}));
+}
+function drawClockIcon(cx,cy,color){
+  svg.appendChild(el('circle',{cx,cy,r:11,fill:'none',stroke:color,'stroke-width':2}));
+  svg.appendChild(el('line',{x1:cx,y1:cy,x2:cx,y2:cy-6,stroke:color,'stroke-width':2}));
+  svg.appendChild(el('line',{x1:cx,y1:cy,x2:cx+5,y2:cy+2,stroke:color,'stroke-width':2}));
+}
+function wrapCaption(cx,cy,text,color,maxWidth){
+  const words = text.split(' ');
+  const lines=[]; let cur='';
+  words.forEach(w=>{
+    if((cur+' '+w).trim().length*6.4 > maxWidth && cur){ lines.push(cur.trim()); cur=w; } else { cur=(cur+' '+w).trim(); }
+  });
+  if(cur) lines.push(cur);
+  lines.forEach((line,i)=>{
+    const t=el('text',{x:cx,y:cy+i*16,'text-anchor':'middle','font-size':12, fill:color, 'font-family':"'Inter',sans-serif",'font-weight':500});
+    t.textContent=line; svg.appendChild(t);
+  });
 }
 
-/* ---- traffic model: shared by every product ---- */
+function effectiveMetrics(product, scenario){
+  const ov = scenario.metricsOverride || {};
+  return {
+    volume: { ...product.metrics.volume, ...(ov.volume||{}) },
+    ratio:  { ...product.metrics.ratio,  ...(ov.ratio||{}) }
+  };
+}
+function effectiveBlend(product, scenario){
+  return { ...product.responseBlend, ...(scenario.responseBlendOverride||{}) };
+}
+
 function computeModel(){
   const product = currentProduct();
+  const scenario = currentScenario();
+  const metrics = effectiveMetrics(product, scenario);
   const volume = state.volume;
   const ratio = state.ratio/100;
   const diverted = volume*ratio;
   const passthrough = volume-diverted;
-  return { volume, diverted, passthrough, unit: product.metrics.volume.unit };
+  return { volume, diverted, passthrough, unit: metrics.volume.unit };
 }
 
-/* ---- fixed visual primitives — the only ways a use case can decorate the base flow ---- */
 const PRIMITIVES = {
-  funnel(ctx){
-    const { colX, midY, state, model } = ctx;
-    const nSample = Math.min(state.clients, 8);
-    for(let i=0;i<nSample;i++){
-      const yOff=(i-(nSample-1)/2)*7;
-      svg.appendChild(el('path',{d:bezier(colX.right-53, midY+yOff+30, colX.mid+82, midY-46), fill:'none', stroke:tok('blue-50'), 'stroke-width':1.1, 'stroke-dasharray':'2 7', opacity:0.5}));
-    }
-    badge(colX.mid, midY+112, model.passthrough.toFixed(1)+' '+model.unit+' '+ctx.product.model.passthroughLabel);
-  },
   fanout(ctx){
-    const { colX, midY, state } = ctx;
-    const shown=Math.min(state.upstreams,6);
-    const totalH=shown*34+(shown-1)*10;
-    let y=midY-totalH/2+17;
-    for(let i=0;i<shown;i++){
-      svg.appendChild(el('path',{d:bezier(colX.mid-82, midY, colX.left+77, y), fill:'none', stroke:tok('purple-50'), 'stroke-width':1.4, opacity:0.55}));
-      y+=44;
-    }
-  },
-  blockGate(ctx){
-    const { colX, midY, model, product } = ctx;
-    svg.appendChild(el('circle',{cx:colX.mid, cy:midY-46, r:9, fill:'none', stroke:tok('red'), 'stroke-width':2.4}));
-    svg.appendChild(el('line',{x1:colX.mid-6,y1:midY-52,x2:colX.mid+6,y2:midY-40,stroke:tok('red'),'stroke-width':2.4}));
-    badge(colX.mid, midY+112, model.diverted.toFixed(1)+' '+model.unit+' '+product.model.divertedLabel, 'danger');
+    const { colX, groupCenters } = ctx;
+    groupCenters.left.forEach(cy=>{
+      svg.appendChild(el('path',{d:bezier(colX.mid-70, ctx.midY, colX.left+95, cy), fill:'none', stroke:tok('purple-50'), 'stroke-width':1.3, opacity:0.55}));
+    });
   },
   badge(ctx, effect){
     const { colX, midY } = ctx;
-    const y = effect.position==='aboveMid' ? midY-118 : midY+112;
+    const y = effect.position==='aboveMid' ? midY-96 : midY+96;
     badge(colX.mid, y, effect.text(ctx.model));
+  },
+  blockGate(ctx, effect){
+    const { colX, midY, model, product } = ctx;
+    const danger = effect.style !== 'quarantine';
+    const color = danger ? tok('red') : tok('purple-50');
+    const cx = colX.mid, cy = midY-96;
+    svg.appendChild(el('circle',{cx, cy, r:9, fill:'none', stroke:color, 'stroke-width':2.2}));
+    svg.appendChild(el('line',{x1:cx-6,y1:cy-6,x2:cx+6,y2:cy+6,stroke:color,'stroke-width':2.2}));
+    svg.appendChild(el('line',{x1:cx-6,y1:cy+6,x2:cx+6,y2:cy-6,stroke:color,'stroke-width':2.2}));
+    const label = model.diverted.toFixed(1)+' '+model.unit+' '+(danger ? (effect.divertedLabel || product.model.divertedLabel) : (effect.quarantineLabel || 'held for review'));
+    badge(colX.mid, midY+96, label, danger?'danger':'quarantine');
   }
 };
 
-/* ---- render ---- */
-function renderDiagram(){
-  clearSvg();
-  const H=620, midY=H/2;
-  const product = currentProduct();
-  const scenario = currentScenario();
-  const nodeFill = tok('node-bg'), nodeStroke = tok('node-border');
-  const textColor = tok('text-primary'), secText = tok('text-secondary');
-  const midFill = tok('mid-fill'), blue60 = tok('blue-60');
-
-  const colX = { left:130, mid:600, right:1070 };
-  [product.tierLabels.left, product.tierLabels.mid, product.tierLabels.right].forEach((t,i)=>{
-    tagText([colX.left,colX.mid,colX.right][i], 40, t.toUpperCase(), secText);
-  });
-
-  const leftNames=[]; for(let i=0;i<state.upstreams;i++) leftNames.push(product.leftNodeNames[i%product.leftNodeNames.length]);
-  stackNodes(colX.left, midY, state.upstreams, 148, 34, 10, 6, i=>leftNames[i], nodeFill, nodeStroke, textColor);
-  stackNodes(colX.mid, midY, state.nodes, 158, 42, 12, 5, product.midNodeLabel, midFill, blue60, textColor);
-  stackNodes(colX.right, midY, state.clients, 100, 30, 8, 6, product.rightNodeLabel, nodeFill, nodeStroke, textColor);
-
-  const model = computeModel();
-  const maxV = product.metrics.volume.max;
-  const rightVol = mapRange(state.volume,0,maxV,0,1);
-  const leftVol = mapRange(model.passthrough,0,maxV,0,1);
-
-  const blend = product.responseBlend;
-  const weight = blend.weightSource==='diverted' ? model.diverted/model.volume : model.passthrough/model.volume;
-  const responseColor = scenario.responseFixed ? tok(scenario.responseFixed) : mixHex(tok(blend.colorA), tok(blend.colorB), weight);
-  const originColor = scenario.originColorOverride ? tok(scenario.originColorOverride) : tok(blend.colorB);
-  const blue = tok('blue-50');
-
-  const spread=46;
-  const midY_reqR = midY-spread, midY_resR = midY+spread;
-
-  // right (clients) <-> mid
-  makeFlowLane(colX.right-53, midY_reqR, colX.mid+82, midY_reqR, blue, rightVol, -1);
-  addArrow(colX.mid+88, midY_reqR, 'left', blue, 6);
-  makeFlowLane(colX.mid+82, midY_resR, colX.right-53, midY_resR, responseColor, rightVol, 1);
-  addArrow(colX.right-59, midY_resR, 'right', responseColor, 6);
-
-  // mid <-> left (origins)
-  makeFlowLane(colX.mid-82, midY_reqR, colX.left+77, midY_reqR, blue, leftVol, -1);
-  addArrow(colX.left+83, midY_reqR, 'left', blue, 6);
-  makeFlowLane(colX.left+77, midY_resR, colX.mid-82, midY_resR, originColor, leftVol, 1);
-  addArrow(colX.mid-88, midY_resR, 'right', originColor, 6);
-
-  // dispatch this use case's declared effects through the fixed primitive set
-  const ctx = { colX, midY, state, model, product };
-  (scenario.effects||[]).forEach(effect=>{
-    const fn = PRIMITIVES[effect.type];
-    if(fn) fn(ctx, effect);
-  });
+function groupLayout(count, boxH, gap, midY){
+  const totalH = count*boxH+(count-1)*gap;
+  const topY = midY - totalH/2;
+  const centers=[];
+  for(let i=0;i<count;i++) centers.push(topY + i*(boxH+gap) + boxH/2);
+  return centers;
 }
 
-/* ---- animation ---- */
+/* ---- shared canvas layout — one source of truth for every diagram-shaped render mode ---- */
+const LAYOUT = { midY:310, colX:{left:175, mid:600, right:1025}, boxW:225, boxH:76, gap:13 };
+
+function layoutFor(product){
+  const { midY, colX, boxW, boxH, gap } = LAYOUT;
+  return {
+    midY, colX, boxW, boxH,
+    leftCenters: groupLayout(product.leftGroups.length, boxH, gap, midY),
+    rightCenters: groupLayout(product.rightGroups.length, boxH, gap, midY)
+  };
+}
+
+/** Draws the left/right source & consumer group boxes plus their tier-label headers. */
+function drawSkeleton(product, L, textColor, secText, dimLeft){
+  product.leftGroups.forEach((grp,i)=> drawGroupBox(L.colX.left, L.leftCenters[i], L.boxW, L.boxH, grp.label, grp.lines, textColor, secText, dimLeft));
+  product.rightGroups.forEach((grp,i)=> drawGroupBox(L.colX.right, L.rightCenters[i], L.boxW, L.boxH, grp.label, grp.lines, textColor, secText, false));
+  tagText(L.colX.left, L.leftCenters[0]-L.boxH/2-22, product.tierLabels.left, secText);
+  tagText(L.colX.right, L.rightCenters[0]-L.boxH/2-22, product.tierLabels.right, secText);
+}
+
+/** Draws the dark product card in the middle column. Returns its {midW, midH} for callers that need to position content relative to it. */
+function drawMidCard(colX, midY, product, mechanismText, statusText){
+  const midW=200, midH=300;
+  svg.appendChild(el('rect',{x:colX.mid-midW/2,y:midY-midH/2,width:midW,height:midH,rx:6, fill:tok('mid-fill')}));
+  svg.appendChild(el('rect',{x:colX.mid-midW/2,y:midY-midH/2,width:midW,height:4, fill:tok('lime-50')}));
+  const nameT = el('text',{x:colX.mid,y:midY-midH/2+40,'text-anchor':'middle','font-size':14,'font-weight':700, fill:tok('mid-text'), 'font-family':"'Inter',sans-serif"});
+  nameT.textContent = product.label; svg.appendChild(nameT);
+  tagText(colX.mid, midY-midH/2+58, product.tagline, tok('lime-50'), 8.5);
+  if(mechanismText){
+    const mechT = el('text',{x:colX.mid,y:midY+8,'text-anchor':'middle','font-size':13,'font-weight':600, fill:'#fff', 'font-family':"'Inter',sans-serif"});
+    mechT.textContent = mechanismText; svg.appendChild(mechT);
+  }
+  if(statusText){
+    const st = el('text',{x:colX.mid,y:midY+30,'text-anchor':'middle','font-size':10.5, fill:tok('lime-50'), 'font-family':"'IBM Plex Mono',monospace"});
+    st.textContent = statusText; svg.appendChild(st);
+  }
+  return { midW, midH };
+}
+
+/** Standard "STEP n OF total — LABEL" + wrapped caption, used under every diagram and chart. */
+function drawStepFooter(cx, y, stepLabel, secText, caption, captionColor, maxWidth){
+  tagText(cx, y, stepLabel, secText, 9.5);
+  wrapCaption(cx, y+22, caption, captionColor, maxWidth||300);
+}
+
+/** The generic 3-beat label used by any scenario that doesn't define its own custom steps. */
+function genericStepLabel(step, productLabel){
+  if(step===0) return 'STEP 1 OF 3 — WITHOUT '+productLabel.toUpperCase();
+  if(step===1) return 'STEP 2 OF 3 — '+productLabel.toUpperCase()+' ENTERS THE PATH';
+  return 'STEP 3 OF 3 — MECHANISM ENGAGED';
+}
+
+/* ---- chart render mode (Ora Streaming) ---- */
+const CHART_PLOT = { x0:150, x1:1050, y0:460, y1:110 };
+
+function renderChartScenario(product, scenario, secText, textColor){
+  const step = state.step;
+  const title = el('text',{x:600,y:60,'text-anchor':'middle','font-size':15,'font-weight':600, fill:textColor, 'font-family':"'Inter',sans-serif"});
+  title.textContent = scenario.label; svg.appendChild(title);
+  if(scenario.chartType==='cost') renderCostChart(secText, step);
+  if(scenario.chartType==='loadbalance') renderLoadBalanceChart(secText, step);
+
+  const captions = [scenario.painLabel, scenario.transitionLabel || product.label+' changes the pricing shape.', scenario.benefitLabel];
+  const colors = [tok('red'), secText, tok('teal-50')];
+  drawStepFooter(600, 522, genericStepLabel(step, product.label), secText, captions[step], colors[step], 320);
+}
+
+function renderSequenceScenario(product, scenario, textColor, secText){
+  const L = layoutFor(product);
+  drawSkeleton(product, L, textColor, secText, false);
+
+  const { midW, midH } = drawMidCard(L.colX, L.midY, product, scenario.label);
+
+  const step = scenario.steps[state.step] || scenario.steps[0];
+  step.render({ colX:L.colX, midY:L.midY, leftCenters:L.leftCenters, rightCenters:L.rightCenters, boxW:L.boxW, boxH:L.boxH, product, scenario, state });
+
+  drawStepFooter(L.colX.mid, L.midY+midH/2+30, 'STEP '+(state.step+1)+' OF '+scenario.steps.length, secText, step.caption, textColor, 320);
+}
+
+function computeCostChart(){
+  const product = currentProduct(), scenario = currentScenario();
+  const maxVol = effectiveMetrics(product, scenario).volume.max;
+  const rate = 100;        // $ per TB, illustrative traditional variable pricing
+  const flatFee = 6000;    // $/mo flat fee, illustrative
+  const traffic = state.volume;
+  const variableCost = traffic*rate;
+  const savings = variableCost - flatFee;
+  const crossover = flatFee/rate;
+  return { rate, flatFee, maxVol, traffic, variableCost, savings, crossover };
+}
+
+function renderCostChart(secText, step){
+  const { x0,x1,y0,y1 } = CHART_PLOT;
+  const c = computeCostChart();
+  const yForCost = (cost)=> mapRange(cost, 0, c.rate*c.maxVol, y0, y1);
+  const xForVol = (v)=> mapRange(v, 0, c.maxVol, x0, x1);
+
+  svg.appendChild(el('line',{x1:x0,y1:y0,x2:x1,y2:y0, stroke:tok('panel-border'), 'stroke-width':1.5}));
+  svg.appendChild(el('line',{x1:x0,y1:y0,x2:x0,y2:y1, stroke:tok('panel-border'), 'stroke-width':1.5}));
+  tagText((x0+x1)/2, y0+34, 'Monthly traffic volume →', secText, 10);
+  tagText(x0-70, (y0+y1)/2, '↑ Monthly cost', secText, 10);
+
+  // variable cost diagonal — visible from step 0
+  svg.appendChild(el('path',{d:`M ${x0} ${y0} L ${x1} ${yForCost(c.rate*c.maxVol)}`, fill:'none', stroke:tok('gray-60'), 'stroke-width':2.5}));
+  tagText(x1-60, yForCost(c.rate*c.maxVol)-14, 'Variable $/GB', tok('gray-60'), 9.5);
+
+  if(step>=1){
+    const yFlat = yForCost(c.flatFee);
+    if(step===2){
+      const cxCross = xForVol(c.crossover);
+      svg.appendChild(el('rect',{x:cxCross, y:y1, width:Math.max(0,x1-cxCross), height:y0-y1, fill:tok('teal-50'), opacity:0.08}));
+    }
+    svg.appendChild(el('path',{d:`M ${x0} ${yFlat} L ${x1} ${yFlat}`, fill:'none', stroke:tok('teal-50'), 'stroke-width':3}));
+    addArrow(x1+2, yFlat, 'right', tok('teal-50'), 6);
+    tagText(x1-40, yFlat-14, 'Ora flat fee', tok('teal-50'), 9.5);
+
+    if(step===2){
+      const mx = xForVol(c.traffic), myVar = yForCost(c.variableCost);
+      svg.appendChild(el('line',{x1:mx,y1:y0,x2:mx,y2:myVar, stroke:tok('blue-50'), 'stroke-width':1.3, 'stroke-dasharray':'3 4'}));
+      svg.appendChild(el('circle',{cx:mx, cy:myVar, r:5.5, fill:tok('blue-50')}));
+      svg.appendChild(el('circle',{cx:mx, cy:yFlat, r:5.5, fill:tok('teal-50')}));
+    }
+  }
+}
+
+function computeLoadChart(){
+  const multiplier = state.ratio/100; // slider 100-400 -> 1.0x-4.0x
+  return { multiplier };
+}
+
+function renderLoadBalanceChart(secText, step){
+  const { x0,x1,y0,y1 } = CHART_PLOT;
+  const capH = (y0-y1)*0.42;
+  const capY = y0-capH;
+  const { multiplier } = computeLoadChart();
+  const extra = capH*(multiplier-1);
+
+  svg.appendChild(el('line',{x1:x0,y1:y0,x2:x1,y2:y0, stroke:tok('panel-border'), 'stroke-width':1.5}));
+  tagText((x0+x1)/2, y0+34, 'Time →', secText, 10);
+
+  if(step>=1){
+    svg.appendChild(el('rect',{x:x0,y:capY,width:x1-x0,height:capH, fill:tok('teal-50'), opacity:0.85}));
+    tagText(x0+70, capY-10, 'Committed capacity', tok('teal-50'), 9.5);
+  }
+
+  function hump(cx, width, peakExtra){
+    const left = cx-width/2, right = cx+width/2, top = capY-peakExtra;
+    return `M ${left} ${capY} C ${left+width*0.15} ${top}, ${cx-width*0.2} ${top}, ${cx} ${top} S ${right-width*0.15} ${capY}, ${right} ${capY} Z`;
+  }
+  const humpW = (x1-x0)*0.28;
+  [ (x0+x1)*0.38, (x0+x1)*0.66 ].forEach((cx,i)=>{
+    const peakExtra = extra*(i===0?1:0.62);
+    svg.appendChild(el('path',{d:hump(cx,humpW,peakExtra), fill:tok('gray-50'), opacity:0.55}));
+  });
+  if(step===2){
+    tagText((x0+x1)/2, capY-extra-18, 'Demand at '+ (multiplier).toFixed(1) +'× baseline', secText, 10);
+  }
+}
+
+function renderDiagram(){
+  clearSvg();
+  const product = currentProduct();
+  const scenario = currentScenario();
+  const textColor = tok('text-primary'), secText = tok('text-secondary');
+  drawGridBackdrop();
+
+  if(scenario.renderMode==='chart'){
+    renderChartScenario(product, scenario, secText, textColor);
+    return;
+  }
+  if(scenario.steps){
+    renderSequenceScenario(product, scenario, textColor, secText);
+    return;
+  }
+
+  const L = layoutFor(product);
+  const { colX, boxW, boxH, leftCenters, rightCenters, midY } = L;
+
+  const step = state.step;
+  const outageActive = scenario.supportsOutageToggle && step===2 && state.outage;
+  const offlineText = scenario.offlineLabel || 'OFFLINE';
+
+  drawSkeleton(product, L, textColor, secText, outageActive);
+
+  const model = computeModel();
+  const metrics = effectiveMetrics(product, scenario);
+  const maxV = metrics.volume.max;
+
+  /* ---- step 0: pain — no acceleration layer, direct undifferentiated traffic ---- */
+  if(step===0){
+    const rightVol = mapRange(state.volume,0,maxV,0,1);
+    const painColor = tok('red');
+    if(scenario.supportsOutageToggle){
+      leftCenters.forEach(cy=>{ badge(colX.left, cy-boxH/2-10, offlineText, 'danger'); });
+      rightCenters.forEach((ry)=>{
+        svg.appendChild(el('path',{d:bezier(colX.right-112, ry, colX.mid, midY), fill:'none', stroke:painColor, 'stroke-width':2, 'stroke-dasharray':'3 6', opacity:0.7}));
+      });
+      svg.appendChild(el('line',{x1:colX.mid-11,y1:midY-11,x2:colX.mid+11,y2:midY+11,stroke:painColor,'stroke-width':3}));
+      svg.appendChild(el('line',{x1:colX.mid-11,y1:midY+11,x2:colX.mid+11,y2:midY-11,stroke:painColor,'stroke-width':3}));
+    } else {
+      makeFlowLane(colX.right-112, midY-30, colX.left+112, midY-30, tok('blue-50'), rightVol, -1);
+      addArrow(colX.left+118, midY-30, 'left', tok('blue-50'), 5.5);
+      makeFlowLane(colX.left+112, midY+30, colX.right-112, midY+30, painColor, rightVol, 1, 0.85);
+      addArrow(colX.right-118, midY+30, 'right', painColor, 5.5);
+    }
+    drawStepFooter(colX.mid, midY+140, genericStepLabel(0, product.label), secText, scenario.painLabel, painColor, 260);
+    return;
+  }
+
+  /* ---- steps 1 & 2 both show the acceleration layer in place ---- */
+  const blend = effectiveBlend(product, scenario);
+  const originColorTok = step===2 && scenario.originColorOverride ? scenario.originColorOverride : blend.colorB;
+  const weight = blend.weightSource==='diverted' ? model.diverted/model.volume : model.passthrough/model.volume;
+  const rightVol = mapRange(state.volume,0,maxV,0,1);
+  const leftVol = outageActive ? 0 : (step===2 ? mapRange(model.passthrough,0,maxV,0,1) : rightVol*0.35);
+  const responseColor = outageActive ? tok('teal-50') : (step===2 ? mixHex(tok(blend.colorA), tok(blend.colorB), weight) : mixHex(tok('teal-50'), tok('pink-50'), 0.3));
+  const originColor = tok(originColorTok);
+  const blue = tok('blue-50');
+  const spread=34;
+
+  const mechanismText = step===2 ? scenario.label : 'entering the path…';
+  const statusText = outageActive ? (scenario.resilientStatusText || 'SERVING FROM CACHE') : null;
+  const { midW, midH } = drawMidCard(colX, midY, product, mechanismText, statusText);
+
+  makeFlowLane(colX.right-112, midY-spread, colX.mid+midW/2+8, midY-spread, blue, rightVol, -1);
+  addArrow(colX.mid+midW/2+14, midY-spread, 'left', blue, 5.5);
+  makeFlowLane(colX.mid+midW/2+8, midY+spread, colX.right-112, midY+spread, responseColor, rightVol, 1);
+  addArrow(colX.right-118, midY+spread, 'right', responseColor, 5.5);
+
+  if(outageActive){
+    leftCenters.forEach(cy=> badge(colX.left, cy-boxH/2-10, offlineText, 'danger'));
+    svg.appendChild(el('path',{d:bezier(colX.mid-midW/2-8, midY, colX.left+112, midY), fill:'none', stroke:tok('red'), 'stroke-width':2, 'stroke-dasharray':'3 6', opacity:0.6}));
+  } else {
+    makeFlowLane(colX.mid-midW/2-8, midY-spread, colX.left+112, midY-spread, blue, leftVol, -1);
+    addArrow(colX.left+118, midY-spread, 'left', blue, 5.5);
+    makeFlowLane(colX.left+112, midY+spread, colX.mid-midW/2-8, midY+spread, originColor, leftVol, 1);
+    addArrow(colX.mid-midW/2-14, midY+spread, 'right', originColor, 5.5);
+  }
+
+  if(step===2){
+    const ctx = { colX, midY, state, model, product, groupCenters:{left:leftCenters,right:rightCenters} };
+    (scenario.effects||[]).forEach(effect=>{
+      const fn = PRIMITIVES[effect.type];
+      if(fn) fn(ctx, effect);
+    });
+    if(outageActive){
+      badge(colX.mid, midY-midH/2-24, '0 '+(scenario.goodLabel || 'builds affected'), 'good');
+    }
+  }
+
+  const label = step===1 ? genericStepLabel(1, product.label) : genericStepLabel(2, product.label);
+  const caption = step===1 ? (scenario.transitionLabel || product.label+' now sits between every source and every consumer.') : scenario.benefitLabel;
+  const capColor = step===1 ? secText : tok('teal-50');
+  drawStepFooter(colX.mid, midY+midH/2+30, label, secText, caption, capColor, 300);
+}
+
 let lastT = performance.now();
 function tick(now){
   const dt = Math.min(0.05,(now-lastT)/1000); lastT=now;
@@ -409,7 +1111,7 @@ function tick(now){
 requestAnimationFrame(tick);
 
 /* =========================================================================
-   UI — built entirely from PRODUCTS at load time and on product switch.
+   UI
    ========================================================================= */
 
 function buildProductRail(){
@@ -418,7 +1120,6 @@ function buildProductRail(){
   Object.keys(PRODUCTS).forEach(key=>{
     const item = document.createElement('div');
     item.className = 'rail-item'+(key===state.product?' active':'');
-    item.dataset.product = key;
     item.innerHTML = `<span>${PRODUCTS[key].label}</span><span class="tag">LIVE</span>`;
     item.addEventListener('click', ()=>selectProduct(key));
     wrap.appendChild(item);
@@ -426,12 +1127,11 @@ function buildProductRail(){
   PRODUCTS_COMING_SOON.forEach(name=>{
     const item = document.createElement('div');
     item.className = 'rail-item';
-    item.style.opacity = '0.6';
+    item.style.opacity = '0.55';
     item.innerHTML = `<span>${name}</span><span class="tag">soon</span>`;
     wrap.appendChild(item);
   });
 }
-
 function buildScenarioRail(){
   const wrap = document.getElementById('railScenarios');
   wrap.innerHTML = '';
@@ -442,9 +1142,8 @@ function buildScenarioRail(){
     item.addEventListener('click', ()=>selectScenario(sc.id));
     wrap.appendChild(item);
   });
-  document.getElementById('railScenariosLabel').textContent = currentProduct().label+' — use cases';
+  document.getElementById('railScenariosLabel').textContent = currentProduct().label+' — mechanisms';
 }
-
 function buildScenarioButtons(){
   const wrap = document.getElementById('scenarioBtns');
   wrap.innerHTML = '';
@@ -456,88 +1155,158 @@ function buildScenarioButtons(){
     wrap.appendChild(b);
   });
 }
-
 function buildLegend(){
   const wrap = document.getElementById('legend');
-  wrap.innerHTML = currentProduct().legend.map(l=>
-    `<span><i class="dot" style="background:var(--${l.color})"></i>${l.label}</span>`
-  ).join('');
+  let items = currentProduct().legend.slice();
+  if(currentScenario().supportsOutageToggle) items = items.concat([{color:'red',label:'Offline / failed'}]);
+  wrap.innerHTML = items.map(l=>`<span><i class="dot" style="background:var(--${l.color})"></i>${l.label}</span>`).join('');
 }
-
 function applyMetricControls(){
   const product = currentProduct();
-  const v = product.metrics.volume, r = product.metrics.ratio;
+  const scenario = currentScenario();
+  const metrics = effectiveMetrics(product, scenario);
+  const v = metrics.volume, r = metrics.ratio;
   const volInput = document.getElementById('sl-volume'), ratInput = document.getElementById('sl-ratio');
   volInput.min=v.min; volInput.max=v.max; volInput.step=v.step; volInput.value=state.volume;
   ratInput.min=r.min; ratInput.max=r.max; ratInput.step=r.step; ratInput.value=state.ratio;
   document.getElementById('lab-volume').textContent = v.label;
   document.getElementById('lab-ratio').textContent = r.label;
-  document.getElementById('lab-left').textContent = product.tierLabels.left;
-  document.getElementById('lab-mid').textContent = product.tierLabels.mid+' nodes';
-  document.getElementById('lab-right').textContent = product.tierLabels.right;
+  const isSequence = !!scenario.steps;
+  document.getElementById('cg-volume').style.display = (v.hidden||isSequence) ? 'none' : '';
+  document.getElementById('cg-ratio').style.display = (r.hidden||isSequence) ? 'none' : '';
 }
+function stepCount(sc){ return sc.steps ? sc.steps.length : 3; }
 
+function updateModeUI(){
+  const sc = currentScenario();
+  const n = stepCount(sc);
+  const outageEl = document.getElementById('outageToggle');
+  const showOutageToggle = !sc.steps && sc.renderMode!=='chart' && sc.supportsOutageToggle && state.step===2;
+  outageEl.classList.toggle('hidden', !showOutageToggle);
+  outageEl.classList.toggle('on', state.outage);
+
+  const dotsWrap = document.getElementById('stepDots');
+  dotsWrap.innerHTML = Array.from({length:n}).map((_,i)=>`<span class="step-dot${i===state.step?' active':''}" data-i="${i}"></span>`).join('');
+  dotsWrap.querySelectorAll('.step-dot').forEach(d=>d.addEventListener('click',()=>{ state.step=parseInt(d.dataset.i,10); refresh(); }));
+  document.getElementById('stepPrev').disabled = state.step===0;
+  document.getElementById('stepNext').disabled = state.step===n-1;
+}
 function selectProduct(key){
   state.product = key;
   const product = PRODUCTS[key];
-  state.scenario = product.scenarios[0].id;
-  state.volume = product.metrics.volume.default;
-  state.ratio = product.metrics.ratio.default;
+  const firstScenario = product.scenarios[0];
+  const metrics = effectiveMetrics(product, firstScenario);
+  state.scenario = firstScenario.id;
+  state.step = 0;
+  state.outage = false;
+  state.volume = metrics.volume.default;
+  state.ratio = metrics.ratio.default;
   document.getElementById('topTitle').textContent = product.label;
   buildProductRail(); buildScenarioRail(); buildScenarioButtons(); buildLegend(); applyMetricControls();
   refresh();
 }
-
 function selectScenario(id){
+  const product = currentProduct();
+  const scenario = product.scenarios.find(s=>s.id===id);
+  const metrics = effectiveMetrics(product, scenario);
   state.scenario = id;
+  state.step = 0;
+  state.outage = false;
+  state.volume = metrics.volume.default;
+  state.ratio = metrics.ratio.default;
   document.querySelectorAll('.sc-item').forEach(b=>b.classList.toggle('active', b.dataset.sc===id));
   document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.toggle('active', b.dataset.sc===id));
-  document.getElementById('topSubtitle').textContent = currentScenario().subtitle;
+  document.getElementById('topSubtitle').textContent = currentScenario().label;
+  buildLegend();
+  applyMetricControls();
   refresh();
 }
-
-document.querySelectorAll('[data-adj]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const key=btn.getAttribute('data-adj');
-    const delta=parseInt(btn.getAttribute('data-delta'),10);
-    const min={clients:1,nodes:1,upstreams:1}[key];
-    const max={clients:60,nodes:8,upstreams:8}[key];
-    state[key]=Math.max(min,Math.min(max,state[key]+delta));
-    refresh();
-  });
+document.getElementById('outageToggle').addEventListener('click', ()=>{ state.outage = !state.outage; refresh(); });
+document.getElementById('stepPrev').addEventListener('click', ()=>{ if(state.step>0){ state.step--; refresh(); } });
+document.getElementById('stepNext').addEventListener('click', ()=>{
+  const sc = currentScenario();
+  if(state.step < stepCount(sc)-1){ state.step++; refresh(); }
 });
 document.getElementById('sl-volume').addEventListener('input', e=>{ state.volume=parseFloat(e.target.value); refresh(); });
 document.getElementById('sl-ratio').addEventListener('input', e=>{ state.ratio=parseFloat(e.target.value); refresh(); });
 document.getElementById('themeToggle').addEventListener('click', ()=>{
   state.theme = state.theme==='light'?'dark':'light';
   document.body.setAttribute('data-theme', state.theme);
-  document.getElementById('themeToggle').textContent = state.theme==='light' ? '◐ dark mode':'◑ light mode';
+  document.getElementById('themeToggle').textContent = state.theme==='light' ? '◐ dark':'◑ light';
   refresh();
 });
 
 function refresh(){
   const product = currentProduct();
-  document.getElementById('val-clients').textContent = state.clients;
-  document.getElementById('val-nodes').textContent = state.nodes;
-  document.getElementById('val-upstreams').textContent = state.upstreams;
-  document.getElementById('val-volume').textContent = state.volume+' '+product.metrics.volume.unit;
-  document.getElementById('val-ratio').textContent = state.ratio+product.metrics.ratio.unit;
+  const sc = currentScenario();
+  const metrics = effectiveMetrics(product, sc);
+  document.getElementById('val-volume').textContent = state.volume+' '+metrics.volume.unit;
+  document.getElementById('val-ratio').textContent = state.ratio+metrics.ratio.unit;
+  document.getElementById('outageToggleLabel').textContent = state.outage ? (sc.toggleOnText || 'Origin outage: ON') : (sc.toggleOffText || 'Simulate origin outage');
+
+  const badgeEl = document.querySelector('.impact-badge');
+  badgeEl.classList.remove('pain','good');
+  badgeEl.style.display = '';
+
+  if(sc.steps){
+    badgeEl.style.display = 'none';
+    renderDiagram();
+    updateModeUI();
+    return;
+  }
+
+  if(sc.renderMode==='chart'){
+    if(state.step<2){
+      badgeEl.style.display = 'none';
+    } else if(sc.chartType==='cost'){
+      const c = computeCostChart();
+      if(c.savings>=0){ badgeEl.classList.add('good'); document.getElementById('impactNum').textContent = '$'+Math.round(c.savings).toLocaleString(); document.getElementById('impactLab').textContent = 'saved / mo'; }
+      else { document.getElementById('impactNum').textContent = '$'+Math.round(-c.savings).toLocaleString(); document.getElementById('impactLab').textContent = 'to breakeven'; }
+    } else if(sc.chartType==='loadbalance'){
+      const l = computeLoadChart();
+      badgeEl.classList.add('good');
+      document.getElementById('impactNum').textContent = l.multiplier.toFixed(1)+'×';
+      document.getElementById('impactLab').textContent = 'peak, zero drops';
+    }
+    renderDiagram();
+    updateModeUI();
+    return;
+  }
 
   const model = computeModel();
-  document.getElementById('impactNum').textContent = model.diverted.toFixed(1)+' '+model.unit;
-  document.getElementById('impactLab').textContent = product.model.divertedLabel;
+  const outageActive = sc.supportsOutageToggle && state.step===2 && state.outage;
 
+  if(state.step===0){
+    badgeEl.classList.add('pain');
+    if(sc.supportsOutageToggle){
+      document.getElementById('impactNum').textContent = sc.beforeFailNum || '100%';
+      document.getElementById('impactLab').textContent = sc.beforeFailLabel || 'builds failing';
+    } else {
+      document.getElementById('impactNum').textContent = state.volume+' '+model.unit;
+      document.getElementById('impactLab').textContent = product.model.beforeLabel;
+    }
+  } else if(state.step===1){
+    badgeEl.style.display = 'none';
+  } else if(outageActive){
+    badgeEl.classList.add('good');
+    document.getElementById('impactNum').textContent = '0';
+    document.getElementById('impactLab').textContent = sc.goodLabel || 'builds affected';
+  } else {
+    document.getElementById('impactNum').textContent = model.diverted.toFixed(1)+' '+model.unit;
+    document.getElementById('impactLab').textContent = sc.divertedLabel || product.model.divertedLabel;
+  }
+
+  updateModeUI();
   renderDiagram();
 }
 
-/* ---- boot ---- */
 buildProductRail();
 buildScenarioRail();
 buildScenarioButtons();
 buildLegend();
 applyMetricControls();
 document.getElementById('topTitle').textContent = currentProduct().label;
-document.getElementById('topSubtitle').textContent = currentScenario().subtitle;
+document.getElementById('topSubtitle').textContent = currentScenario().label;
 refresh();
 </script>
 </body>
