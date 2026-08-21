@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Varnish Demo Console — Virtual Registry</title>
+<title>Varnish Demo Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -10,6 +10,7 @@
     --blue-10:#E5F2FF; --blue-20:#B2D9FF; --blue-30:#66BAFF; --blue-40:#33A3FF;
     --blue-50:#008CFF; --blue-60:#0763ED; --blue-70:#0D51B8; --blue-80:#0B418C;
     --pink-50:#B84DFF; --purple-50:#594DFF; --teal-50:#00BECC; --lime-50:#B4E52E;
+    --red:#DA1E28;
     --gray-05:#FAFAFA; --gray-10:#F7F7F7; --gray-20:#F0F0F0; --gray-30:#E1E2E3;
     --gray-40:#B8B8B8; --gray-50:#949AA2; --gray-60:#818181; --gray-70:#4E5157;
     --gray-80:#383B40; --gray-85:#25272A; --gray-90:#141415; --gray-100:#0A0A0A;
@@ -18,20 +19,20 @@
     --node-bg: var(--gray-20); --node-border: var(--gray-60);
     --text-primary: var(--gray-100); --text-secondary: var(--gray-70);
     --rail-bg: var(--gray-100); --rail-text: var(--gray-10); --rail-text-dim: var(--gray-60);
-    --varnish-fill: #E5F2FF;
+    --mid-fill: #E5F2FF;
   }
   [data-theme="dark"]{
     --bg: var(--gray-100); --panel-bg: var(--gray-90); --panel-border: var(--gray-80);
     --node-bg: var(--gray-90); --node-border: var(--gray-70);
     --text-primary: var(--gray-10); --text-secondary: var(--gray-50);
-    --varnish-fill: #0D2363;
+    --mid-fill: #0D2363;
   }
   *{box-sizing:border-box;}
   body{ margin:0; height:100vh; overflow:hidden; font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
     background:var(--bg); color:var(--text-primary); display:flex; }
   .mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; }
 
-  .rail{ width:240px; min-width:240px; background:var(--rail-bg); color:var(--rail-text);
+  .rail{ width:250px; min-width:250px; background:var(--rail-bg); color:var(--rail-text);
     display:flex; flex-direction:column; padding:20px 0; height:100vh; overflow-y:auto; }
   .rail-brand{ padding:0 20px 18px; font-weight:700; font-size:15px; letter-spacing:.02em; }
   .rail-brand span{ color:var(--blue-40); }
@@ -76,14 +77,13 @@
 
   input[type=range]{ width:130px; accent-color: var(--blue-50); }
   .slider-row{ display:flex; align-items:center; gap:8px; }
-  .slider-row .val{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; min-width:64px; }
+  .slider-row .val{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; min-width:70px; }
 
   .scenario-btns{ display:flex; gap:8px; flex-wrap:wrap; }
   .scenario-btn{ padding:8px 14px; border-radius:100px; border:1px solid var(--panel-border); background:transparent; color:var(--text-primary); font-size:12px; cursor:pointer; font-weight:500; }
   .scenario-btn:hover{ background:var(--node-bg); }
   .scenario-btn.active{ background:var(--gray-100); color:var(--white); border-color:var(--gray-100); }
   [data-theme="dark"] .scenario-btn.active{ background:var(--blue-50); border-color:var(--blue-50); color:var(--white); }
-
   .spacer{ flex:1; }
 </style>
 </head>
@@ -91,29 +91,20 @@
 
 <div class="rail">
   <div class="rail-brand">VARNISH <span>// DEMO CONSOLE</span></div>
-
   <div class="rail-section-label">Products</div>
-  <div class="rail-item active">Virtual Registry <span class="tag">LIVE</span></div>
-  <div class="rail-item">Artifact Firewall <span class="tag">soon</span></div>
-  <div class="rail-item">Ora Streaming <span class="tag">soon</span></div>
-  <div class="rail-item">Varnish CDN <span class="tag">soon</span></div>
-  <div class="rail-item">Varnish AI Accelerator <span class="tag">soon</span></div>
-  <div class="rail-item">Varnish Enterprise <span class="tag">soon</span></div>
+  <div id="railProducts"></div>
 
-  <div class="rail-section-label">Virtual Registry — views</div>
-  <div class="rail-item sc-item active" data-sc="baseline">Steady-state traffic</div>
-  <div class="rail-item sc-item" data-sc="coalescing">Cache miss + coalescing</div>
-  <div class="rail-item sc-item" data-sc="multi_registry">One endpoint, many registries</div>
-  <div class="rail-item sc-item" data-sc="private_caching">Auth-preserving private caching</div>
+  <div class="rail-section-label" id="railScenariosLabel">Use cases</div>
+  <div id="railScenarios"></div>
 
   <div style="flex:1"></div>
-  <div style="padding:14px 20px; font-size:11px; color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace;">prototype v0.3</div>
+  <div style="padding:14px 20px; font-size:11px; color:var(--rail-text-dim); font-family:'IBM Plex Mono',monospace;">prototype v0.4 — data-driven</div>
 </div>
 
 <div class="main">
   <div class="topbar">
     <div>
-      <h1>Virtual Registry</h1>
+      <h1 id="topTitle">Virtual Registry</h1>
       <div class="subtitle" id="topSubtitle">Steady-state traffic</div>
     </div>
     <button class="theme-toggle" id="themeToggle">◐ dark mode</button>
@@ -124,29 +115,24 @@
       <svg id="diagram" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet"></svg>
       <div class="impact-badge">
         <div class="num" id="impactNum">72 TB</div>
-        <div class="lab">offloaded / mo</div>
+        <div class="lab" id="impactLab">offloaded / mo</div>
       </div>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--blue-50)"></i>Request</span>
-        <span><i class="dot" style="background:var(--teal-50)"></i>Served from cache</span>
-        <span><i class="dot" style="background:var(--pink-50)"></i>Origin fetch</span>
-        <span><i class="dot" style="background:var(--purple-50)"></i>Routing</span>
-      </div>
+      <div class="legend" id="legend"></div>
     </div>
   </div>
 
   <div class="controls">
     <div class="controls-row">
       <div class="control-group">
-        <label>Clients</label>
+        <label id="lab-left">Origins</label>
         <div class="stepper">
-          <button data-adj="clients" data-delta="-1">−</button>
-          <span class="val" id="val-clients">24</span>
-          <button data-adj="clients" data-delta="1">+</button>
+          <button data-adj="upstreams" data-delta="-1">−</button>
+          <span class="val" id="val-upstreams">4</span>
+          <button data-adj="upstreams" data-delta="1">+</button>
         </div>
       </div>
       <div class="control-group">
-        <label>Varnish nodes</label>
+        <label id="lab-mid">Varnish nodes</label>
         <div class="stepper">
           <button data-adj="nodes" data-delta="-1">−</button>
           <span class="val" id="val-nodes">2</span>
@@ -154,33 +140,33 @@
         </div>
       </div>
       <div class="control-group">
-        <label>Upstreams</label>
+        <label id="lab-right">Clients</label>
         <div class="stepper">
-          <button data-adj="upstreams" data-delta="-1">−</button>
-          <span class="val" id="val-upstreams">4</span>
-          <button data-adj="upstreams" data-delta="1">+</button>
+          <button data-adj="clients" data-delta="-1">−</button>
+          <span class="val" id="val-clients">24</span>
+          <button data-adj="clients" data-delta="1">+</button>
         </div>
       </div>
       <div class="spacer"></div>
       <div class="control-group">
-        <label>View</label>
+        <label>Use case</label>
         <div class="scenario-btns" id="scenarioBtns"></div>
       </div>
     </div>
 
     <div class="controls-row">
       <div class="control-group" style="min-width:220px">
-        <label>Monthly traffic volume</label>
+        <label id="lab-volume">Monthly traffic volume</label>
         <div class="slider-row">
-          <input type="range" id="sl-traffic" min="1" max="1000" step="1" value="80">
-          <span class="val" id="val-traffic">80 TB/mo</span>
+          <input type="range" id="sl-volume">
+          <span class="val" id="val-volume"></span>
         </div>
       </div>
       <div class="control-group" style="min-width:190px">
-        <label>Cache hit ratio</label>
+        <label id="lab-ratio">Cache hit ratio</label>
         <div class="slider-row">
-          <input type="range" id="sl-hit" min="0" max="100" step="5" value="90">
-          <span class="val" id="val-hit">90%</span>
+          <input type="range" id="sl-ratio">
+          <span class="val" id="val-ratio"></span>
         </div>
       </div>
       <div class="spacer"></div>
@@ -189,25 +175,87 @@
 </div>
 
 <script>
-/* ---------------- state ---------------- */
-const state = {
-  clients: 24, nodes: 2, upstreams: 4, scenario: 'baseline', theme: 'light',
-  traffic: 80, hitRatio: 90
-};
+/* =========================================================================
+   DATA LAYER — every product and use case lives here. Nothing below this
+   block needs to change to add a new use case, and adding a new product
+   needs at most one new "effect" if its story genuinely needs a new shape.
+   ========================================================================= */
+
 const ORIGIN_SOURCES = ['JFrog Artifactory','Sonatype Nexus','Docker Hub','npm Registry','PyPI','Maven Central','Amazon ECR','Google Artifact Registry','Azure Container Registry','S3-backed store'];
 
-const SC_LABELS = { baseline:'Steady-state traffic', coalescing:'Cache miss + coalescing', multi_registry:'Many registries', private_caching:'Private caching' };
-const SC_SUBTITLE = { baseline:'Steady-state traffic', coalescing:'Cache miss + request coalescing', multi_registry:'One endpoint, many registries', private_caching:'Auth-preserving private caching' };
+const PRODUCTS = {
 
-/* ---------------- color helpers ---------------- */
-function tok(v){ if(v.startsWith('var(')){ const t=v.slice(4,-1).trim(); return getComputedStyle(document.documentElement).getPropertyValue(t).trim(); } return v; }
-function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return [n>>16&255, n>>8&255, n&255]; }
+  virtual_registry: {
+    label: 'Virtual Registry',
+    tierLabels: { left:'Origins', mid:'Varnish', right:'Clients' },
+    leftNodeNames: ORIGIN_SOURCES,
+    midNodeLabel: i => 'VARNISH-'+(i+1),
+    rightNodeLabel: i => 'client-'+String(i+1).padStart(2,'0'),
+    metrics: {
+      volume: { label:'Monthly traffic volume', unit:'TB/mo', min:1, max:1000, step:1, default:80 },
+      ratio:  { label:'Cache hit ratio', unit:'%', min:0, max:100, step:5, default:90 }
+    },
+    model: { divertedLabel:'offloaded / mo', passthroughLabel:'reaches origin' },
+    responseBlend: { colorA:'teal-50', colorB:'pink-50', weightSource:'passthrough' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Served from cache' },
+      { color:'pink-50', label:'Origin fetch' },
+      { color:'purple-50', label:'Routing' }
+    ],
+    scenarios: [
+      { id:'baseline', label:'Steady-state', subtitle:'Steady-state traffic', effects: [] },
+      { id:'coalescing', label:'Cache miss + coalescing', subtitle:'Cache miss + request coalescing', responseFixed:'pink-50', effects: [ {type:'funnel'} ] },
+      { id:'multi_registry', label:'Many registries', subtitle:'One endpoint, many registries', originColorOverride:'purple-50', effects: [ {type:'fanout'} ] },
+      { id:'private_caching', label:'Private caching', subtitle:'Auth-preserving private caching', effects: [ {type:'badge', text: () => '🔒 auth-checked', position:'aboveMid'} ] }
+    ]
+  },
+
+  artifact_firewall: {
+    label: 'Artifact Firewall',
+    tierLabels: { left:'Origins', mid:'Firewall', right:'Clients' },
+    leftNodeNames: ORIGIN_SOURCES,
+    midNodeLabel: i => 'FIREWALL-'+(i+1),
+    rightNodeLabel: i => 'client-'+String(i+1).padStart(2,'0'),
+    metrics: {
+      volume: { label:'Monthly package requests', unit:'TB/mo', min:1, max:1000, step:1, default:60 },
+      ratio:  { label:'Policy block rate', unit:'%', min:0, max:100, step:5, default:8 }
+    },
+    model: { divertedLabel:'blocked / mo', passthroughLabel:'allowed to origin' },
+    responseBlend: { colorA:'teal-50', colorB:'red', weightSource:'diverted' },
+    legend: [
+      { color:'blue-50', label:'Request' },
+      { color:'teal-50', label:'Allowed' },
+      { color:'red', label:'Blocked' }
+    ],
+    scenarios: [
+      { id:'policy_enforcement', label:'Request-time policy', subtitle:'Blocks risky packages before they reach origin', effects: [ {type:'blockGate'} ] }
+    ]
+  }
+
+};
+
+const PRODUCTS_COMING_SOON = ['Ora Streaming','Varnish CDN','Varnish AI Accelerator','Varnish Enterprise'];
+
+/* =========================================================================
+   ENGINE — generic. Reads PRODUCTS + current state, knows nothing about
+   any specific product or use case by name.
+   ========================================================================= */
+
+const state = { product:'virtual_registry', scenario:'baseline', clients:24, nodes:2, upstreams:4, volume:80, ratio:90, theme:'light' };
+
+function currentProduct(){ return PRODUCTS[state.product]; }
+function currentScenario(){ return currentProduct().scenarios.find(s=>s.id===state.scenario); }
+
+/* ---- color helpers ---- */
+function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue('--'+name).trim(); }
+function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return [n>>16&255,n>>8&255,n&255]; }
 function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join(''); }
-function mixHex(a,b,t){ const A=hexToRgb(a), B=hexToRgb(b); return rgbToHex(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t); }
-function lighten(hex,amt){ return mixHex(hex, '#ffffff', amt); }
-function mapRange(v,i0,i1,o0,o1){ v=Math.max(i0,Math.min(i1,v)); return o0 + (v-i0)/(i1-i0)*(o1-o0); }
+function mixHex(a,b,t){ const A=hexToRgb(a),B=hexToRgb(b); return rgbToHex(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t); }
+function lighten(hex,amt){ return mixHex(hex,'#ffffff',amt); }
+function mapRange(v,i0,i1,o0,o1){ v=Math.max(i0,Math.min(i1,v)); return o0+(v-i0)/(i1-i0)*(o1-o0); }
 
-/* ---------------- svg core ---------------- */
+/* ---- svg core ---- */
 const svg = document.getElementById('diagram');
 const NS='http://www.w3.org/2000/svg';
 function el(tag,attrs){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -234,18 +282,16 @@ function stackNodes(cx, topY, count, w, h, gap, maxShow, labelFn, fill, stroke, 
 
 function bezier(x1,y1,x2,y2){ const dx=(x2-x1)*0.45; return `M ${x1} ${y1} C ${x1+dx} ${y1}, ${x2-dx} ${y2}, ${x2} ${y2}`; }
 
-/* ---------------- continuous ripple flow ---------------- */
 function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign){
   flowSeq++;
-  const id = 'flow'+flowSeq;
+  const id='flow'+flowSeq;
   const strokeW = mapRange(volumeNorm,0,1,2,12);
   const tileW = mapRange(volumeNorm,0,1,110,42);
   const highlight = lighten(colorHex,0.55);
 
   const grad = el('linearGradient',{id:'grad-'+id, x1:'0', y1:'0', x2:'1', y2:'0'});
   grad.appendChild(el('stop',{offset:'0%', 'stop-color':colorHex, 'stop-opacity':0.28}));
-  const midStop = el('stop',{offset:'50%', 'stop-color':highlight, 'stop-opacity':0.95});
-  grad.appendChild(midStop);
+  grad.appendChild(el('stop',{offset:'50%', 'stop-color':highlight, 'stop-opacity':0.95}));
   grad.appendChild(el('stop',{offset:'100%', 'stop-color':colorHex, 'stop-opacity':0.28}));
   defs.appendChild(grad);
 
@@ -258,7 +304,6 @@ function makeFlowLane(x1,y1,x2,y2, colorHex, volumeNorm, dirSign){
 
   const speed = mapRange(volumeNorm,0,1,14,90) * dirSign;
   flows.push({ pattern, tileW, speed, x:0 });
-  return { strokeW };
 }
 
 function addArrow(x,y,dir,color,size){
@@ -266,130 +311,213 @@ function addArrow(x,y,dir,color,size){
   const pts = dir==='left' ? `${x+size},${y-size} ${x},${y} ${x+size},${y+size}` : `${x-size},${y-size} ${x},${y} ${x-size},${y+size}`;
   svg.appendChild(el('polygon',{points:pts, fill:color}));
 }
-function badge(cx,cy,text){
+function badge(cx,cy,text,style){
+  const bg = style==='danger' ? tok('red') : tok('gray-100');
   const w = 22 + text.length*6.4;
-  svg.appendChild(el('rect',{x:cx-w/2,y:cy-15,width:w,height:30,rx:15, fill:tok('var(--gray-100)'), opacity:0.94}));
+  svg.appendChild(el('rect',{x:cx-w/2,y:cy-15,width:w,height:30,rx:15, fill:bg, opacity:0.95}));
   const t=el('text',{x:cx,y:cy+4,'text-anchor':'middle','font-size':11.5, fill:'#fff','font-family':"'IBM Plex Mono',monospace"});
   t.textContent=text; svg.appendChild(t);
 }
-function tag(x,y,text,color){
+function tagText(x,y,text,color){
   const t=el('text',{x,y,'text-anchor':'middle','font-size':10.5, fill:color, 'font-family':"'IBM Plex Mono',monospace"});
   t.textContent=text; svg.appendChild(t);
 }
 
-/* ---------------- compute traffic model ---------------- */
+/* ---- traffic model: shared by every product ---- */
 function computeModel(){
-  const traffic = state.traffic;              // TB/mo, customer input
-  const hit = state.hitRatio/100;              // customer input
-  const offloadedTraffic = traffic*hit;        // TB/mo served from cache — derived from the two inputs
-  const originTraffic = traffic-offloadedTraffic; // TB/mo that still reaches backend
-  return { traffic, offloadedTraffic, originTraffic };
+  const product = currentProduct();
+  const volume = state.volume;
+  const ratio = state.ratio/100;
+  const diverted = volume*ratio;
+  const passthrough = volume-diverted;
+  return { volume, diverted, passthrough, unit: product.metrics.volume.unit };
 }
 
-/* ---------------- render ---------------- */
-function renderDiagram(){
-  clearSvg();
-  const H=620, midY=H/2;
-  const nodeFill = getComputedStyle(document.documentElement).getPropertyValue('--node-bg');
-  const nodeStroke = getComputedStyle(document.documentElement).getPropertyValue('--node-border');
-  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-  const secText = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-  const varnishFill = getComputedStyle(document.documentElement).getPropertyValue('--varnish-fill');
-  const blue60 = getComputedStyle(document.documentElement).getPropertyValue('--blue-60').trim() || '#0763ED';
-
-  const colX = { origin:130, varnish:600, client:1070 };
-  ['Origins','Varnish','Clients'].forEach((t,i)=>{
-    tag([colX.origin,colX.varnish,colX.client][i], 40, t.toUpperCase(), secText);
-  });
-
-  const originNames=[]; for(let i=0;i<state.upstreams;i++) originNames.push(ORIGIN_SOURCES[i%ORIGIN_SOURCES.length]);
-  stackNodes(colX.origin, midY, state.upstreams, 148, 34, 10, 6, i=>originNames[i], nodeFill, nodeStroke, textColor);
-  stackNodes(colX.varnish, midY, state.nodes, 158, 42, 12, 5, i=>'VARNISH-'+(i+1), varnishFill, blue60, textColor);
-  stackNodes(colX.client, midY, state.clients, 100, 30, 8, 6, i=>'client-'+String(i+1).padStart(2,'0'), nodeFill, nodeStroke, textColor);
-
-  const model = computeModel();
-  const maxV = 1000;
-  const clientVol = mapRange(state.traffic,0,maxV,0,1);
-  const originVol = mapRange(model.originTraffic,0,maxV,0,1);
-
-  const teal = tok('var(--teal-50)'), pink = tok('var(--pink-50)'), purple = tok('var(--purple-50)'), blue = tok('var(--blue-50)');
-  const responseColor = mixHex(teal, pink, 1-state.hitRatio/100);
-
-  const spread = 46;
-  const cvReqY = midY-spread, cvResY = midY+spread;
-  const voReqY = midY-spread, voResY = midY+spread;
-
-  // client <-> varnish
-  makeFlowLane(colX.client-53, cvReqY, colX.varnish+82, cvReqY, blue, clientVol, -1);
-  addArrow(colX.varnish+88, cvReqY, 'left', blue, 6);
-  makeFlowLane(colX.varnish+82, cvResY, colX.client-53, cvResY, responseColor, clientVol, 1);
-  addArrow(colX.client-59, cvResY, 'right', responseColor, 6);
-
-  // varnish <-> origin
-  const originColor = state.scenario==='multi_registry' ? purple : pink;
-  makeFlowLane(colX.varnish-82, voReqY, colX.origin+77, voReqY, blue, originVol, -1);
-  addArrow(colX.origin+83, voReqY, 'left', blue, 6);
-  makeFlowLane(colX.origin+77, voResY, colX.varnish-82, voResY, originColor, originVol, 1);
-  addArrow(colX.varnish-88, voResY, 'right', originColor, 6);
-
-  // scenario overlays
-  if(state.scenario==='coalescing'){
+/* ---- fixed visual primitives — the only ways a use case can decorate the base flow ---- */
+const PRIMITIVES = {
+  funnel(ctx){
+    const { colX, midY, state, model } = ctx;
     const nSample = Math.min(state.clients, 8);
     for(let i=0;i<nSample;i++){
       const yOff=(i-(nSample-1)/2)*7;
-      const p = el('path',{d:bezier(colX.client-53, midY+yOff+30, colX.varnish+82, midY-46), fill:'none', stroke:blue, 'stroke-width':1.1, 'stroke-dasharray':'2 7', opacity:0.5});
-      svg.appendChild(p);
+      svg.appendChild(el('path',{d:bezier(colX.right-53, midY+yOff+30, colX.mid+82, midY-46), fill:'none', stroke:tok('blue-50'), 'stroke-width':1.1, 'stroke-dasharray':'2 7', opacity:0.5}));
     }
-    badge(colX.varnish, midY+112, Math.round(model.originTraffic*10)/10+' TB/mo reaches origin');
-  }
-  if(state.scenario==='multi_registry'){
+    badge(colX.mid, midY+112, model.passthrough.toFixed(1)+' '+model.unit+' '+ctx.product.model.passthroughLabel);
+  },
+  fanout(ctx){
+    const { colX, midY, state } = ctx;
     const shown=Math.min(state.upstreams,6);
     const totalH=shown*34+(shown-1)*10;
     let y=midY-totalH/2+17;
     for(let i=0;i<shown;i++){
-      svg.appendChild(el('path',{d:bezier(colX.varnish-82, midY, colX.origin+77, y), fill:'none', stroke:purple, 'stroke-width':1.4, opacity:0.55}));
+      svg.appendChild(el('path',{d:bezier(colX.mid-82, midY, colX.left+77, y), fill:'none', stroke:tok('purple-50'), 'stroke-width':1.4, opacity:0.55}));
       y+=44;
     }
+  },
+  blockGate(ctx){
+    const { colX, midY, model, product } = ctx;
+    svg.appendChild(el('circle',{cx:colX.mid, cy:midY-46, r:9, fill:'none', stroke:tok('red'), 'stroke-width':2.4}));
+    svg.appendChild(el('line',{x1:colX.mid-6,y1:midY-52,x2:colX.mid+6,y2:midY-40,stroke:tok('red'),'stroke-width':2.4}));
+    badge(colX.mid, midY+112, model.diverted.toFixed(1)+' '+model.unit+' '+product.model.divertedLabel, 'danger');
+  },
+  badge(ctx, effect){
+    const { colX, midY } = ctx;
+    const y = effect.position==='aboveMid' ? midY-118 : midY+112;
+    badge(colX.mid, y, effect.text(ctx.model));
   }
-  if(state.scenario==='private_caching'){
-    badge(colX.varnish, midY-118, '🔒 auth-checked');
-  }
+};
+
+/* ---- render ---- */
+function renderDiagram(){
+  clearSvg();
+  const H=620, midY=H/2;
+  const product = currentProduct();
+  const scenario = currentScenario();
+  const nodeFill = tok('node-bg'), nodeStroke = tok('node-border');
+  const textColor = tok('text-primary'), secText = tok('text-secondary');
+  const midFill = tok('mid-fill'), blue60 = tok('blue-60');
+
+  const colX = { left:130, mid:600, right:1070 };
+  [product.tierLabels.left, product.tierLabels.mid, product.tierLabels.right].forEach((t,i)=>{
+    tagText([colX.left,colX.mid,colX.right][i], 40, t.toUpperCase(), secText);
+  });
+
+  const leftNames=[]; for(let i=0;i<state.upstreams;i++) leftNames.push(product.leftNodeNames[i%product.leftNodeNames.length]);
+  stackNodes(colX.left, midY, state.upstreams, 148, 34, 10, 6, i=>leftNames[i], nodeFill, nodeStroke, textColor);
+  stackNodes(colX.mid, midY, state.nodes, 158, 42, 12, 5, product.midNodeLabel, midFill, blue60, textColor);
+  stackNodes(colX.right, midY, state.clients, 100, 30, 8, 6, product.rightNodeLabel, nodeFill, nodeStroke, textColor);
+
+  const model = computeModel();
+  const maxV = product.metrics.volume.max;
+  const rightVol = mapRange(state.volume,0,maxV,0,1);
+  const leftVol = mapRange(model.passthrough,0,maxV,0,1);
+
+  const blend = product.responseBlend;
+  const weight = blend.weightSource==='diverted' ? model.diverted/model.volume : model.passthrough/model.volume;
+  const responseColor = scenario.responseFixed ? tok(scenario.responseFixed) : mixHex(tok(blend.colorA), tok(blend.colorB), weight);
+  const originColor = scenario.originColorOverride ? tok(scenario.originColorOverride) : tok(blend.colorB);
+  const blue = tok('blue-50');
+
+  const spread=46;
+  const midY_reqR = midY-spread, midY_resR = midY+spread;
+
+  // right (clients) <-> mid
+  makeFlowLane(colX.right-53, midY_reqR, colX.mid+82, midY_reqR, blue, rightVol, -1);
+  addArrow(colX.mid+88, midY_reqR, 'left', blue, 6);
+  makeFlowLane(colX.mid+82, midY_resR, colX.right-53, midY_resR, responseColor, rightVol, 1);
+  addArrow(colX.right-59, midY_resR, 'right', responseColor, 6);
+
+  // mid <-> left (origins)
+  makeFlowLane(colX.mid-82, midY_reqR, colX.left+77, midY_reqR, blue, leftVol, -1);
+  addArrow(colX.left+83, midY_reqR, 'left', blue, 6);
+  makeFlowLane(colX.left+77, midY_resR, colX.mid-82, midY_resR, originColor, leftVol, 1);
+  addArrow(colX.mid-88, midY_resR, 'right', originColor, 6);
+
+  // dispatch this use case's declared effects through the fixed primitive set
+  const ctx = { colX, midY, state, model, product };
+  (scenario.effects||[]).forEach(effect=>{
+    const fn = PRIMITIVES[effect.type];
+    if(fn) fn(ctx, effect);
+  });
 }
 
-/* ---------------- animation ---------------- */
+/* ---- animation ---- */
 let lastT = performance.now();
 function tick(now){
-  const dt = Math.min(0.05, (now-lastT)/1000); lastT=now;
-  flows.forEach(f=>{
-    f.x += f.speed*dt;
-    f.x = f.x % f.tileW;
-    f.pattern.setAttribute('patternTransform', `translate(${f.x},0)`);
-  });
+  const dt = Math.min(0.05,(now-lastT)/1000); lastT=now;
+  flows.forEach(f=>{ f.x=(f.x+f.speed*dt)%f.tileW; f.pattern.setAttribute('patternTransform',`translate(${f.x},0)`); });
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
 
-/* ---------------- scenario buttons ---------------- */
-const btnWrap = document.getElementById('scenarioBtns');
-Object.keys(SC_LABELS).forEach(key=>{
-  const b=document.createElement('button');
-  b.className='scenario-btn'+(key==='baseline'?' active':'');
-  b.textContent=SC_LABELS[key]; b.dataset.sc=key;
-  b.addEventListener('click', ()=>selectScenario(key));
-  btnWrap.appendChild(b);
-});
-function selectScenario(key){
-  state.scenario=key;
-  document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.toggle('active', b.dataset.sc===key));
-  document.querySelectorAll('.sc-item').forEach(b=>b.classList.toggle('active', b.dataset.sc===key));
-  document.getElementById('topSubtitle').textContent = SC_SUBTITLE[key];
+/* =========================================================================
+   UI — built entirely from PRODUCTS at load time and on product switch.
+   ========================================================================= */
+
+function buildProductRail(){
+  const wrap = document.getElementById('railProducts');
+  wrap.innerHTML = '';
+  Object.keys(PRODUCTS).forEach(key=>{
+    const item = document.createElement('div');
+    item.className = 'rail-item'+(key===state.product?' active':'');
+    item.dataset.product = key;
+    item.innerHTML = `<span>${PRODUCTS[key].label}</span><span class="tag">LIVE</span>`;
+    item.addEventListener('click', ()=>selectProduct(key));
+    wrap.appendChild(item);
+  });
+  PRODUCTS_COMING_SOON.forEach(name=>{
+    const item = document.createElement('div');
+    item.className = 'rail-item';
+    item.style.opacity = '0.6';
+    item.innerHTML = `<span>${name}</span><span class="tag">soon</span>`;
+    wrap.appendChild(item);
+  });
+}
+
+function buildScenarioRail(){
+  const wrap = document.getElementById('railScenarios');
+  wrap.innerHTML = '';
+  currentProduct().scenarios.forEach(sc=>{
+    const item = document.createElement('div');
+    item.className = 'rail-item sc-item'+(sc.id===state.scenario?' active':'');
+    item.textContent = sc.label; item.dataset.sc = sc.id;
+    item.addEventListener('click', ()=>selectScenario(sc.id));
+    wrap.appendChild(item);
+  });
+  document.getElementById('railScenariosLabel').textContent = currentProduct().label+' — use cases';
+}
+
+function buildScenarioButtons(){
+  const wrap = document.getElementById('scenarioBtns');
+  wrap.innerHTML = '';
+  currentProduct().scenarios.forEach(sc=>{
+    const b = document.createElement('button');
+    b.className = 'scenario-btn'+(sc.id===state.scenario?' active':'');
+    b.textContent = sc.label; b.dataset.sc = sc.id;
+    b.addEventListener('click', ()=>selectScenario(sc.id));
+    wrap.appendChild(b);
+  });
+}
+
+function buildLegend(){
+  const wrap = document.getElementById('legend');
+  wrap.innerHTML = currentProduct().legend.map(l=>
+    `<span><i class="dot" style="background:var(--${l.color})"></i>${l.label}</span>`
+  ).join('');
+}
+
+function applyMetricControls(){
+  const product = currentProduct();
+  const v = product.metrics.volume, r = product.metrics.ratio;
+  const volInput = document.getElementById('sl-volume'), ratInput = document.getElementById('sl-ratio');
+  volInput.min=v.min; volInput.max=v.max; volInput.step=v.step; volInput.value=state.volume;
+  ratInput.min=r.min; ratInput.max=r.max; ratInput.step=r.step; ratInput.value=state.ratio;
+  document.getElementById('lab-volume').textContent = v.label;
+  document.getElementById('lab-ratio').textContent = r.label;
+  document.getElementById('lab-left').textContent = product.tierLabels.left;
+  document.getElementById('lab-mid').textContent = product.tierLabels.mid+' nodes';
+  document.getElementById('lab-right').textContent = product.tierLabels.right;
+}
+
+function selectProduct(key){
+  state.product = key;
+  const product = PRODUCTS[key];
+  state.scenario = product.scenarios[0].id;
+  state.volume = product.metrics.volume.default;
+  state.ratio = product.metrics.ratio.default;
+  document.getElementById('topTitle').textContent = product.label;
+  buildProductRail(); buildScenarioRail(); buildScenarioButtons(); buildLegend(); applyMetricControls();
   refresh();
 }
-document.querySelectorAll('.sc-item').forEach(item=>{
-  item.addEventListener('click', ()=>selectScenario(item.getAttribute('data-sc')));
-});
 
-/* ---------------- controls wiring ---------------- */
+function selectScenario(id){
+  state.scenario = id;
+  document.querySelectorAll('.sc-item').forEach(b=>b.classList.toggle('active', b.dataset.sc===id));
+  document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.toggle('active', b.dataset.sc===id));
+  document.getElementById('topSubtitle').textContent = currentScenario().subtitle;
+  refresh();
+}
+
 document.querySelectorAll('[data-adj]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const key=btn.getAttribute('data-adj');
@@ -400,9 +528,8 @@ document.querySelectorAll('[data-adj]').forEach(btn=>{
     refresh();
   });
 });
-document.getElementById('sl-traffic').addEventListener('input', e=>{ state.traffic=parseInt(e.target.value,10); refresh(); });
-document.getElementById('sl-hit').addEventListener('input', e=>{ state.hitRatio=parseInt(e.target.value,10); refresh(); });
-
+document.getElementById('sl-volume').addEventListener('input', e=>{ state.volume=parseFloat(e.target.value); refresh(); });
+document.getElementById('sl-ratio').addEventListener('input', e=>{ state.ratio=parseFloat(e.target.value); refresh(); });
 document.getElementById('themeToggle').addEventListener('click', ()=>{
   state.theme = state.theme==='light'?'dark':'light';
   document.body.setAttribute('data-theme', state.theme);
@@ -410,20 +537,29 @@ document.getElementById('themeToggle').addEventListener('click', ()=>{
   refresh();
 });
 
-/* ---------------- refresh ---------------- */
 function refresh(){
+  const product = currentProduct();
   document.getElementById('val-clients').textContent = state.clients;
   document.getElementById('val-nodes').textContent = state.nodes;
   document.getElementById('val-upstreams').textContent = state.upstreams;
-  document.getElementById('val-traffic').textContent = state.traffic+' TB/mo';
-  document.getElementById('val-hit').textContent = state.hitRatio+'%';
+  document.getElementById('val-volume').textContent = state.volume+' '+product.metrics.volume.unit;
+  document.getElementById('val-ratio').textContent = state.ratio+product.metrics.ratio.unit;
 
   const model = computeModel();
-  document.getElementById('impactNum').textContent = Math.round(model.offloadedTraffic*10)/10+' TB';
+  document.getElementById('impactNum').textContent = model.diverted.toFixed(1)+' '+model.unit;
+  document.getElementById('impactLab').textContent = product.model.divertedLabel;
 
   renderDiagram();
 }
 
+/* ---- boot ---- */
+buildProductRail();
+buildScenarioRail();
+buildScenarioButtons();
+buildLegend();
+applyMetricControls();
+document.getElementById('topTitle').textContent = currentProduct().label;
+document.getElementById('topSubtitle').textContent = currentScenario().subtitle;
 refresh();
 </script>
 </body>
